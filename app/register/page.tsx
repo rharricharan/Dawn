@@ -22,7 +22,9 @@ export default function RegisterPage() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
+      const tl = gsap.timeline({
+        defaults: { ease: "power3.out", clearProps: "all" }
+      })
 
       if (iconRef.current) {
         tl.from(iconRef.current, {
@@ -31,6 +33,7 @@ export default function RegisterPage() {
           opacity: 0,
           duration: 0.8,
           ease: "back.out(1.7)",
+          clearProps: "all",
         })
       }
 
@@ -41,6 +44,7 @@ export default function RegisterPage() {
             y: 20,
             opacity: 0,
             duration: 0.6,
+            clearProps: "all",
           },
           "-=0.4"
         )
@@ -54,6 +58,7 @@ export default function RegisterPage() {
             opacity: 0,
             duration: 0.5,
             stagger: 0.1,
+            clearProps: "all",
           },
           "-=0.3"
         )
@@ -66,13 +71,14 @@ export default function RegisterPage() {
             y: 10,
             opacity: 0,
             duration: 0.5,
+            clearProps: "all",
           },
           "-=0.2"
         )
       }
     })
 
-    return () => ctx.revert()
+    return () => {}
   }, [])
 
   const handleSignUp = async (formData: FormData) => {

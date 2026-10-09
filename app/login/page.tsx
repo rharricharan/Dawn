@@ -23,7 +23,9 @@ export default function LoginPage() {
 
   useEffect(() => {
     const ctx = gsap.context(() => {
-      const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
+      const tl = gsap.timeline({
+        defaults: { ease: "power3.out", clearProps: "all" }
+      })
 
       // Icon entrance
       if (iconRef.current) {
@@ -33,6 +35,7 @@ export default function LoginPage() {
           opacity: 0,
           duration: 0.8,
           ease: "back.out(1.7)",
+          clearProps: "all",
         })
       }
 
@@ -44,6 +47,7 @@ export default function LoginPage() {
             y: 20,
             opacity: 0,
             duration: 0.6,
+            clearProps: "all",
           },
           "-=0.4"
         )
@@ -58,6 +62,7 @@ export default function LoginPage() {
             opacity: 0,
             duration: 0.5,
             stagger: 0.1,
+            clearProps: "all",
           },
           "-=0.3"
         )
@@ -71,13 +76,15 @@ export default function LoginPage() {
             y: 10,
             opacity: 0,
             duration: 0.5,
+            clearProps: "all",
           },
           "-=0.2"
         )
       }
     })
 
-    return () => ctx.revert()
+    // Don't revert on cleanup - let animations stay
+    return () => {}
   }, [])
 
   const handleEmailSignIn = async (formData: FormData) => {
