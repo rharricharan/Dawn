@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Separator } from "@/components/ui/separator"
 import { KpiTile } from "@/components/dawn/kpi-tile"
 import { ActivityItem } from "@/components/dawn/activity-item"
+import { DashboardEmptyState } from "@/components/dawn/dashboard-empty-state"
 import {
   dashboardStats,
   needsAttention,
@@ -17,6 +18,13 @@ import {
 import { ArrowRight, AlertCircle, Clock, Plus } from "lucide-react"
 
 export default function Dashboard() {
+  // Toggle this to see empty state vs full dashboard
+  const isEmpty = true // Set to false to see the full dashboard with data
+
+  if (isEmpty) {
+    return <DashboardEmptyState />
+  }
+
   return (
     <div className="flex flex-col gap-8 p-8">
       {/* Header */}
