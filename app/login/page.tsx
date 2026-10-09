@@ -302,7 +302,7 @@ export default function LoginPage() {
 
                 {emailStatus === "not-found" && (
                   <p className="text-sm text-muted-foreground">
-                    Looks like you're new here! We'd love to have you join Dawn.{" "}
+                    Looks like you're new her! We'd love to have you!{" "}
                     <Button
                       type="button"
                       variant="link"
