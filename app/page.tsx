@@ -1,29 +1,14 @@
-import { redirect } from "next/navigation"
-import { createClient } from "@/lib/supabase/server"
+"use client"
 
-export const dynamic = 'force-dynamic'
+import { useEffect } from "react"
+import { useRouter } from "next/navigation"
 
-export default async function Home() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+export default function Home() {
+  const router = useRouter()
 
-  // If not logged in, redirect to login
-  if (!user) {
-    redirect("/login")
-  }
+  useEffect(() => {
+    router.push("/login")
+  }, [router])
 
-  // Check if user has completed onboarding
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("onboarding_completed")
-    .eq("id", user.id)
-    .single()
-
-  // If onboarding not completed, redirect to onboarding
-  if (!profile?.onboarding_completed) {
-    redirect("/onboarding")
-  }
-
-  // If authenticated and onboarded, go to dashboard
-  redirect("/dashboard")
+  return null
 }
