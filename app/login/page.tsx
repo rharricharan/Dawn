@@ -126,10 +126,14 @@ export default function LoginPage() {
 
         {/* Heading */}
         <div ref={headingRef} className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Welcome to Dawn</h1>
-          <p className="text-muted-foreground">
-            Sign in to find your next design client
-          </p>
+          <h1 className="text-3xl font-bold">
+            {showEmailForm ? "What's your email address?" : "Welcome to Dawn"}
+          </h1>
+          {!showEmailForm && (
+            <p className="text-muted-foreground">
+              Sign in to find your next design client
+            </p>
+          )}
         </div>
 
         {/* Error Alert */}
@@ -203,57 +207,46 @@ export default function LoginPage() {
               </Button>
             </>
           ) : (
-            <form action={handleEmailSignIn} className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  required
-                  autoComplete="email"
-                />
-              </div>
+            <div className="space-y-4">
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Enter your email address..."
+                required
+                autoComplete="email"
+                className="h-12 text-base"
+              />
 
-              <div className="space-y-2">
-                <Label htmlFor="password">Password</Label>
-                <Input
-                  id="password"
-                  name="password"
-                  type="password"
-                  placeholder="Enter your password"
-                  required
-                  autoComplete="current-password"
-                />
-              </div>
-
-              <div className="flex gap-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="flex-1"
-                  onClick={() => setShowEmailForm(false)}
-                  disabled={isLoading}
-                >
-                  Back
-                </Button>
+              <div className="space-y-3">
                 <Button
                   type="submit"
-                  className="flex-1"
+                  size="lg"
+                  className="w-full h-12"
                   disabled={isLoading}
                 >
                   {isLoading ? (
                     <>
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Signing in...
+                      Continue...
                     </>
                   ) : (
-                    "Sign in"
+                    "Continue with email"
                   )}
                 </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  className="w-full h-12"
+                  onClick={() => setShowEmailForm(false)}
+                  disabled={isLoading}
+                >
+                  Back to login
+                </Button>
               </div>
-            </form>
+            </div>
           )}
         </div>
 
