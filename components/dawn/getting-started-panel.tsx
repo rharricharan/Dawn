@@ -1,6 +1,7 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef, useEffect } from "react"
+import { gsap } from "gsap"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,14 +9,46 @@ import { CheckCircle2, Settings, Clock, X, ChevronLeft } from "lucide-react"
 
 export function GettingStartedPanel() {
   const [isOpen, setIsOpen] = useState(true)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    const ctx = gsap.context(() => {
+      if (isOpen) {
+        // Panel slides in from right
+        gsap.fromTo(
+          panelRef.current,
+          { x: 320, opacity: 0 },
+          { x: 0, opacity: 1, duration: 0.5, ease: "power3.out" }
+        )
+      }
+    })
+
+    return () => ctx.revert()
+  }, [isOpen])
+
+  const handleClose = () => {
+    gsap.to(panelRef.current, {
+      x: 320,
+      opacity: 0,
+      duration: 0.3,
+      ease: "power2.in",
+      onComplete: () => setIsOpen(false),
+    })
+  }
+
+  const handleOpen = () => {
+    setIsOpen(true)
+  }
 
   if (!isOpen) {
     return (
       <Button
+        ref={buttonRef}
         variant="outline"
         size="icon"
         className="fixed right-4 top-20 z-50"
-        onClick={() => setIsOpen(true)}
+        onClick={handleOpen}
       >
         <ChevronLeft className="h-4 w-4" />
       </Button>
@@ -23,7 +56,10 @@ export function GettingStartedPanel() {
   }
 
   return (
-    <div className="fixed right-0 top-16 h-[calc(100vh-4rem)] w-80 border-l bg-background shadow-lg z-40">
+    <div
+      ref={panelRef}
+      className="fixed right-0 top-16 h-[calc(100vh-4rem)] w-80 border-l bg-background shadow-lg z-40"
+    >
       <Card className="h-full rounded-none border-0">
         <CardHeader className="border-b">
           <div className="flex items-center justify-between">
@@ -31,7 +67,7 @@ export function GettingStartedPanel() {
             <Button
               variant="ghost"
               size="icon"
-              onClick={() => setIsOpen(false)}
+              onClick={handleClose}
             >
               <X className="h-4 w-4" />
             </Button>
