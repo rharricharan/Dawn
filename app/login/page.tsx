@@ -10,7 +10,7 @@ import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { signIn, signInWithGoogle } from "@/lib/auth/actions"
-import { startRegistration, startAuthentication } from "@simplewebauthn/browser"
+import { startAuthentication } from "@simplewebauthn/browser"
 import { Mail, Key, Sparkles, Loader2, AlertCircle } from "lucide-react"
 
 export default function LoginPage() {
@@ -18,8 +18,6 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showEmailForm, setShowEmailForm] = useState(false)
-  const [showPasskeyEmail, setShowPasskeyEmail] = useState(false)
-  const [passkeyEmail, setPasskeyEmail] = useState("")
   const containerRef = useRef<HTMLDivElement>(null)
   const iconRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
@@ -116,51 +114,6 @@ export default function LoginPage() {
     }
   }
 
-  const handlePasskeyRegister = async () => {
-    if (!passkeyEmail) {
-      setError("Please enter your email")
-      return
-    }
-
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      // Get registration options from server
-      const optionsRes = await fetch("/api/passkey/register-options", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: passkeyEmail }),
-      })
-
-      if (!optionsRes.ok) {
-        throw new Error("Failed to get registration options")
-      }
-
-      const options = await optionsRes.json()
-
-      // Start WebAuthn registration
-      const credential = await startRegistration(options)
-
-      // Verify registration with server
-      const verifyRes = await fetch("/api/passkey/register-verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: passkeyEmail, credential }),
-      })
-
-      if (!verifyRes.ok) {
-        throw new Error("Failed to verify passkey")
-      }
-
-      // Success! Redirect to onboarding
-      router.push("/onboarding")
-    } catch (err: any) {
-      setError(err.message || "Failed to register passkey")
-      setIsLoading(false)
-    }
-  }
-
   const handlePasskeyAuth = async () => {
     setIsLoading(true)
     setError(null)
@@ -234,59 +187,7 @@ export default function LoginPage() {
 
         {/* Auth Options */}
         <div ref={buttonsRef} className="space-y-3">
-          {showPasskeyEmail ? (
-            <div className="space-y-4">
-              <Input
-                type="email"
-                placeholder="Enter your email address..."
-                value={passkeyEmail}
-                onChange={(e) => setPasskeyEmail(e.target.value)}
-                className="h-12 text-base"
-              />
-
-              <div className="space-y-3">
-                <Button
-                  size="lg"
-                  className="w-full h-12"
-                  onClick={handlePasskeyRegister}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating passkey...
-                    </>
-                  ) : (
-                    "Create passkey"
-                  )}
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full h-12"
-                  onClick={() => {
-                    setShowPasskeyEmail(false)
-                    setPasskeyEmail("")
-                  }}
-                  disabled={isLoading}
-                >
-                  Back to login
-                </Button>
-              </div>
-
-              <div className="text-center">
-                <Button
-                  variant="link"
-                  size="sm"
-                  onClick={handlePasskeyAuth}
-                  disabled={isLoading}
-                >
-                  Already have a passkey? Sign in
-                </Button>
-              </div>
-            </div>
-          ) : showEmailForm ? (
+          {showEmailForm ? (
             <div className="space-y-4">
               <Input
                 id="email"
@@ -381,7 +282,7 @@ export default function LoginPage() {
                 variant="outline"
                 size="lg"
                 className="w-full h-12 text-base"
-                onClick={() => setShowPasskeyEmail(true)}
+                onClick={handlePasskeyAuth}
                 disabled={isLoading}
               >
                 <Key className="mr-2 h-5 w-5" />
