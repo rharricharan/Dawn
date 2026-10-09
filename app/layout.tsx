@@ -23,12 +23,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col font-sans">
         <TooltipProvider>
-          <SidebarProvider>
-            <AppSidebar />
-            <main className="flex-1 w-full">
-              {children}
-            </main>
-          </SidebarProvider>
+          {children}
         </TooltipProvider>
       </body>
     </html>
