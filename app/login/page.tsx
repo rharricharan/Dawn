@@ -234,7 +234,100 @@ export default function LoginPage() {
 
         {/* Auth Options */}
         <div ref={buttonsRef} className="space-y-3">
-          {!showEmailForm ? (
+          {showPasskeyEmail ? (
+            <div className="space-y-4">
+              <Input
+                type="email"
+                placeholder="Enter your email address..."
+                value={passkeyEmail}
+                onChange={(e) => setPasskeyEmail(e.target.value)}
+                className="h-12 text-base"
+              />
+
+              <div className="space-y-3">
+                <Button
+                  size="lg"
+                  className="w-full h-12"
+                  onClick={handlePasskeyRegister}
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Creating passkey...
+                    </>
+                  ) : (
+                    "Create passkey"
+                  )}
+                </Button>
+
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="w-full h-12"
+                  onClick={() => {
+                    setShowPasskeyEmail(false)
+                    setPasskeyEmail("")
+                  }}
+                  disabled={isLoading}
+                >
+                  Back to login
+                </Button>
+              </div>
+
+              <div className="text-center">
+                <Button
+                  variant="link"
+                  size="sm"
+                  onClick={handlePasskeyAuth}
+                  disabled={isLoading}
+                >
+                  Already have a passkey? Sign in
+                </Button>
+              </div>
+            </div>
+          ) : showEmailForm ? (
+            <div className="space-y-4">
+              <Input
+                id="email"
+                name="email"
+                type="email"
+                placeholder="Enter your email address..."
+                required
+                autoComplete="email"
+                className="h-12 text-base"
+              />
+
+              <div className="space-y-3">
+                <Button
+                  type="submit"
+                  size="lg"
+                  className="w-full h-12"
+                  disabled={isLoading}
+                >
+                  {isLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Continue...
+                    </>
+                  ) : (
+                    "Continue with email"
+                  )}
+                </Button>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="lg"
+                  className="w-full h-12"
+                  onClick={() => setShowEmailForm(false)}
+                  disabled={isLoading}
+                >
+                  Back to login
+                </Button>
+              </div>
+            </div>
+          ) : (
             <>
               {/* Continue with Gmail */}
               <Button
@@ -295,99 +388,6 @@ export default function LoginPage() {
                 Continue with Passkey
               </Button>
             </>
-          ) : showPasskeyEmail ? (
-            <div className="space-y-4">
-              <Input
-                type="email"
-                placeholder="Enter your email address..."
-                value={passkeyEmail}
-                onChange={(e) => setPasskeyEmail(e.target.value)}
-                className="h-12 text-base"
-              />
-
-              <div className="space-y-3">
-                <Button
-                  size="lg"
-                  className="w-full h-12"
-                  onClick={handlePasskeyRegister}
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Creating passkey...
-                    </>
-                  ) : (
-                    "Create passkey"
-                  )}
-                </Button>
-
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full h-12"
-                  onClick={() => {
-                    setShowPasskeyEmail(false)
-                    setPasskeyEmail("")
-                  }}
-                  disabled={isLoading}
-                >
-                  Back to login
-                </Button>
-              </div>
-
-              <div className="text-center">
-                <Button
-                  variant="link"
-                  size="sm"
-                  onClick={handlePasskeyAuth}
-                  disabled={isLoading}
-                >
-                  Already have a passkey? Sign in
-                </Button>
-              </div>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter your email address..."
-                required
-                autoComplete="email"
-                className="h-12 text-base"
-              />
-
-              <div className="space-y-3">
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="w-full h-12"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Continue...
-                    </>
-                  ) : (
-                    "Continue with email"
-                  )}
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="lg"
-                  className="w-full h-12"
-                  onClick={() => setShowEmailForm(false)}
-                  disabled={isLoading}
-                >
-                  Back to login
-                </Button>
-              </div>
-            </div>
           )}
         </div>
 
