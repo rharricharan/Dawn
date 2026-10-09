@@ -18,11 +18,15 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showEmailForm, setShowEmailForm] = useState(false)
+  const [email, setEmail] = useState("")
+  const [emailStatus, setEmailStatus] = useState<"idle" | "checking" | "exists" | "not-found">("idle")
+  const [isCheckingEmail, setIsCheckingEmail] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const iconRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const buttonsRef = useRef<HTMLDivElement>(null)
   const footerRef = useRef<HTMLDivElement>(null)
+  const emailCheckTimeout = useRef<NodeJS.Timeout | null>(null)
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -90,6 +94,61 @@ export default function LoginPage() {
     return () => {}
   }, [])
 
+  // Real-time email validation with debouncing
+  useEffect(() => {
+    // Clear previous timeout
+    if (emailCheckTimeout.current) {
+      clearTimeout(emailCheckTimeout.current)
+    }
+
+    // Reset status if email is empty
+    if (!email || !showEmailForm) {
+      setEmailStatus("idle")
+      return
+    }
+
+    // Basic email format validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setEmailStatus("idle")
+      return
+    }
+
+    // Set checking status
+    setEmailStatus("checking")
+    setIsCheckingEmail(true)
+
+    // Debounce the API call
+    emailCheckTimeout.current = setTimeout(async () => {
+      try {
+        const response = await fetch("/api/auth/check-email", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email }),
+        })
+
+        const data = await response.json()
+
+        if (response.ok) {
+          setEmailStatus(data.exists ? "exists" : "not-found")
+        } else {
+          setEmailStatus("idle")
+        }
+      } catch (error) {
+        console.error("Email check error:", error)
+        setEmailStatus("idle")
+      } finally {
+        setIsCheckingEmail(false)
+      }
+    }, 800) // 800ms debounce
+
+    return () => {
+      if (emailCheckTimeout.current) {
+        clearTimeout(emailCheckTimeout.current)
+      }
+    }
+  }, [email, showEmailForm])
+
   const handleEmailSignIn = async (formData: FormData) => {
     setIsLoading(true)
     setError(null)
@@ -106,10 +165,17 @@ export default function LoginPage() {
     setIsLoading(true)
     setError(null)
 
-    const result = await signInWithGoogle()
+    try {
+      const result = await signInWithGoogle()
 
-    if (result?.error) {
-      setError(result.error)
+      if (result?.error) {
+        // Friendly error message
+        setError("We're having trouble connecting to Google. Please try again in a moment.")
+        setIsLoading(false)
+      }
+    } catch (err) {
+      console.error("Google sign-in error:", err)
+      setError("We're experiencing technical difficulties. Please try again or use a different sign-in method.")
       setIsLoading(false)
     }
   }
@@ -125,7 +191,7 @@ export default function LoginPage() {
       })
 
       if (!optionsRes.ok) {
-        throw new Error("Failed to get authentication options")
+        throw new Error("SYSTEM_ERROR")
       }
 
       const options = await optionsRes.json()
@@ -141,13 +207,36 @@ export default function LoginPage() {
       })
 
       if (!verifyRes.ok) {
-        throw new Error("Failed to verify passkey")
+        const data = await verifyRes.json()
+        if (data.error?.includes("not found")) {
+          throw new Error("NO_PASSKEY")
+        }
+        throw new Error("PASSKEY_FAILED")
       }
 
       // Success! Redirect to dashboard
       router.push("/")
     } catch (err: any) {
-      setError(err.message || "Failed to authenticate with passkey")
+      console.error("Passkey auth error:", err)
+
+      // User cancelled the passkey prompt
+      if (err.name === "NotAllowedError" || err.message?.includes("cancelled")) {
+        setIsLoading(false)
+        return
+      }
+
+      // Friendly error messages
+      let errorMessage = "We're having trouble signing you in. Please try again or use a different method."
+
+      if (err.message === "NO_PASSKEY") {
+        errorMessage = "We couldn't find a passkey for your account. Try signing in with Gmail or email instead."
+      } else if (err.message === "PASSKEY_FAILED") {
+        errorMessage = "We couldn't verify your passkey. Please try again or use a different sign-in method."
+      } else if (err.message === "SYSTEM_ERROR") {
+        errorMessage = "We're experiencing technical difficulties. Please try again in a moment."
+      }
+
+      setError(errorMessage)
       setIsLoading(false)
     }
   }
@@ -189,39 +278,80 @@ export default function LoginPage() {
         <div ref={buttonsRef} className="space-y-3">
           {showEmailForm ? (
             <div className="space-y-4">
-              <Input
-                id="email"
-                name="email"
-                type="email"
-                placeholder="Enter your email address..."
-                required
-                autoComplete="email"
-                className="h-12 text-base"
-              />
+              <div className="space-y-2">
+                <Input
+                  id="email"
+                  name="email"
+                  type="email"
+                  placeholder="Enter your email address..."
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  autoComplete="email"
+                  className="h-12 text-base"
+                  autoFocus
+                />
+
+                {/* Real-time email validation feedback */}
+                {emailStatus === "checking" && (
+                  <p className="text-sm text-muted-foreground flex items-center gap-2">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Checking email...
+                  </p>
+                )}
+
+                {emailStatus === "not-found" && (
+                  <div className="space-y-2">
+                    <p className="text-sm text-muted-foreground">
+                      Looks like you're new here! We'd love to have you join Dawn.
+                    </p>
+                    <Button
+                      type="button"
+                      variant="link"
+                      size="sm"
+                      className="h-auto p-0 font-semibold"
+                      onClick={() => router.push(`/register?email=${encodeURIComponent(email)}`)}
+                    >
+                      Create your account →
+                    </Button>
+                  </div>
+                )}
+              </div>
 
               <div className="space-y-3">
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="w-full h-12"
-                  disabled={isLoading}
-                >
-                  {isLoading ? (
-                    <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                      Continue...
-                    </>
-                  ) : (
-                    "Continue with email"
-                  )}
-                </Button>
+                {emailStatus === "exists" && (
+                  <Button
+                    type="submit"
+                    size="lg"
+                    className="w-full h-12"
+                    disabled={isLoading}
+                    onClick={(e) => {
+                      e.preventDefault()
+                      // For now, we'll just show a message since we don't have password
+                      setError("Please use 'Continue with Gmail' or 'Continue with Passkey' to sign in")
+                    }}
+                  >
+                    {isLoading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Continue...
+                      </>
+                    ) : (
+                      "Continue with email"
+                    )}
+                  </Button>
+                )}
 
                 <Button
                   type="button"
                   variant="outline"
                   size="lg"
                   className="w-full h-12"
-                  onClick={() => setShowEmailForm(false)}
+                  onClick={() => {
+                    setShowEmailForm(false)
+                    setEmail("")
+                    setEmailStatus("idle")
+                  }}
                   disabled={isLoading}
                 >
                   Back to login

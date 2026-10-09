@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import { useSearchParams } from "next/navigation"
 import { gsap } from "gsap"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
@@ -12,13 +13,23 @@ import { signUp, signInWithGoogle } from "@/lib/auth/actions"
 import { ArrowLeft, Sparkles, Loader2, AlertCircle } from "lucide-react"
 
 export default function RegisterPage() {
+  const searchParams = useSearchParams()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [email, setEmail] = useState("")
   const containerRef = useRef<HTMLDivElement>(null)
   const iconRef = useRef<HTMLDivElement>(null)
   const headingRef = useRef<HTMLHeadingElement>(null)
   const formRef = useRef<HTMLFormElement>(null)
   const footerRef = useRef<HTMLDivElement>(null)
+
+  // Pre-fill email from query parameter
+  useEffect(() => {
+    const emailParam = searchParams.get("email")
+    if (emailParam) {
+      setEmail(emailParam)
+    }
+  }, [searchParams])
 
   useEffect(() => {
     const ctx = gsap.context(() => {
@@ -85,10 +96,23 @@ export default function RegisterPage() {
     setIsLoading(true)
     setError(null)
 
-    const result = await signUp(formData)
+    try {
+      const result = await signUp(formData)
 
-    if (result?.error) {
-      setError(result.error)
+      if (result?.error) {
+        // Friendly error messages
+        if (result.error.includes("already registered") || result.error.includes("already exists")) {
+          setError("Looks like you already have an account! Try signing in instead.")
+        } else if (result.error.includes("password")) {
+          setError("Please choose a stronger password (at least 6 characters).")
+        } else {
+          setError("We're having trouble creating your account. Please try again or use Google sign-up.")
+        }
+        setIsLoading(false)
+      }
+    } catch (err) {
+      console.error("Sign up error:", err)
+      setError("We're experiencing technical difficulties. Please try again in a moment.")
       setIsLoading(false)
     }
   }
@@ -97,10 +121,16 @@ export default function RegisterPage() {
     setIsLoading(true)
     setError(null)
 
-    const result = await signInWithGoogle()
+    try {
+      const result = await signInWithGoogle()
 
-    if (result?.error) {
-      setError(result.error)
+      if (result?.error) {
+        setError("We're having trouble connecting to Google. Please try again in a moment.")
+        setIsLoading(false)
+      }
+    } catch (err) {
+      console.error("Google sign-up error:", err)
+      setError("We're experiencing technical difficulties. Please try again or use email sign-up.")
       setIsLoading(false)
     }
   }
@@ -160,6 +190,8 @@ export default function RegisterPage() {
               name="email"
               placeholder="you@example.com"
               type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               required
               autoComplete="email"
             />
