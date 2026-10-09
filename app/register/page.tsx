@@ -139,12 +139,13 @@ export default function RegisterPage() {
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">
       <div ref={containerRef} className="w-full max-w-md space-y-8">
         {/* Back button */}
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/login">
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to login
-          </Link>
-        </Button>
+        <Link
+          href="/login"
+          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <ArrowLeft className="mr-2 h-4 w-4" />
+          Back to login
+        </Link>
 
         {/* Logo/Icon */}
         <div ref={iconRef} className="flex justify-center">
@@ -261,11 +262,17 @@ export default function RegisterPage() {
         <div ref={footerRef} className="text-center">
           <p className="text-xs text-muted-foreground">
             By creating an account, you agree to our{" "}
-            <Link href="/terms" className="underline hover:text-foreground">
+            <Link
+              href="/terms"
+              className="underline hover:text-foreground transition-colors"
+            >
               Terms of Service
             </Link>{" "}
             and{" "}
-            <Link href="/privacy" className="underline hover:text-foreground">
+            <Link
+              href="/privacy"
+              className="underline hover:text-foreground transition-colors"
+            >
               Privacy Policy
             </Link>
           </p>

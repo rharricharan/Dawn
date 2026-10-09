@@ -303,15 +303,12 @@ export default function LoginPage() {
                 {emailStatus === "not-found" && (
                   <p className="text-sm text-muted-foreground">
                     Looks like you're new her! We'd love to have you!{" "}
-                    <Button
-                      type="button"
-                      variant="link"
-                      size="sm"
-                      className="h-auto p-0 font-semibold inline"
-                      onClick={() => router.push(`/register?email=${encodeURIComponent(email)}`)}
+                    <Link
+                      href={`/register?email=${encodeURIComponent(email)}`}
+                      className="font-semibold underline hover:text-foreground transition-colors"
                     >
                       Create account
-                    </Button>
+                    </Link>
                   </p>
                 )}
               </div>
@@ -325,7 +322,6 @@ export default function LoginPage() {
                     disabled={isLoading}
                     onClick={(e) => {
                       e.preventDefault()
-                      // For now, we'll just show a message since we don't have password
                       setError("Please use 'Continue with Gmail' or 'Continue with Passkey' to sign in")
                     }}
                   >
@@ -341,7 +337,6 @@ export default function LoginPage() {
                 )}
 
                 <Button
-                  type="button"
                   variant="outline"
                   size="lg"
                   className="w-full h-12"
@@ -349,6 +344,7 @@ export default function LoginPage() {
                     setShowEmailForm(false)
                     setEmail("")
                     setEmailStatus("idle")
+                    setError(null)
                   }}
                   disabled={isLoading}
                 >
@@ -424,22 +420,27 @@ export default function LoginPage() {
         <div ref={footerRef} className="text-center space-y-4">
           <p className="text-sm text-muted-foreground">
             Don&apos;t have an account yet?{" "}
-            <Button
-              variant="link"
-              className="p-0 h-auto font-semibold"
-              asChild
+            <Link
+              href="/register"
+              className="font-semibold underline hover:text-foreground transition-colors"
             >
-              <Link href="/register">Register</Link>
-            </Button>
+              Register
+            </Link>
           </p>
 
           <p className="text-xs text-muted-foreground">
             By continuing, you agree to our{" "}
-            <Link href="/terms" className="underline hover:text-foreground">
+            <Link
+              href="/terms"
+              className="underline hover:text-foreground transition-colors"
+            >
               Terms of Service
             </Link>{" "}
             and{" "}
-            <Link href="/privacy" className="underline hover:text-foreground">
+            <Link
+              href="/privacy"
+              className="underline hover:text-foreground transition-colors"
+            >
               Privacy Policy
             </Link>
           </p>
