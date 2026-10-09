@@ -301,20 +301,18 @@ export default function LoginPage() {
                 )}
 
                 {emailStatus === "not-found" && (
-                  <div className="space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      Looks like you're new here! We'd love to have you join Dawn.
-                    </p>
+                  <p className="text-sm text-muted-foreground">
+                    Looks like you're new here! We'd love to have you join Dawn.{" "}
                     <Button
                       type="button"
                       variant="link"
                       size="sm"
-                      className="h-auto p-0 font-semibold"
+                      className="h-auto p-0 font-semibold inline"
                       onClick={() => router.push(`/register?email=${encodeURIComponent(email)}`)}
                     >
-                      Create your account →
+                      Create account
                     </Button>
-                  </div>
+                  </p>
                 )}
               </div>
 
