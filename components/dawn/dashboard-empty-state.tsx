@@ -28,69 +28,81 @@ export function DashboardEmptyState() {
       const tl = gsap.timeline({ defaults: { ease: "power3.out" } })
 
       // Icon: scale and rotate in
-      tl.from(iconRef.current, {
-        scale: 0,
-        rotation: -180,
-        opacity: 0,
-        duration: 0.8,
-        ease: "back.out(1.7)",
-      })
+      if (iconRef.current) {
+        tl.from(iconRef.current, {
+          scale: 0,
+          rotation: -180,
+          opacity: 0,
+          duration: 0.8,
+          ease: "back.out(1.7)",
+        })
+      }
 
       // Heading: fade up
-      tl.from(
-        headingRef.current,
-        {
-          y: 20,
-          opacity: 0,
-          duration: 0.6,
-        },
-        "-=0.4"
-      )
+      if (headingRef.current) {
+        tl.from(
+          headingRef.current,
+          {
+            y: 20,
+            opacity: 0,
+            duration: 0.6,
+          },
+          "-=0.4"
+        )
+      }
 
       // Description: fade up
-      tl.from(
-        descriptionRef.current,
-        {
-          y: 20,
-          opacity: 0,
-          duration: 0.6,
-        },
-        "-=0.4"
-      )
+      if (descriptionRef.current) {
+        tl.from(
+          descriptionRef.current,
+          {
+            y: 20,
+            opacity: 0,
+            duration: 0.6,
+          },
+          "-=0.4"
+        )
+      }
 
       // Search bar: slide up and grow
-      tl.from(
-        searchRef.current,
-        {
-          y: 30,
-          opacity: 0,
-          scale: 0.95,
-          duration: 0.7,
-        },
-        "-=0.3"
-      )
+      if (searchRef.current) {
+        tl.from(
+          searchRef.current,
+          {
+            y: 30,
+            opacity: 0,
+            scale: 0.95,
+            duration: 0.7,
+          },
+          "-=0.3"
+        )
+      }
 
       // Accordion: fade in
-      tl.from(
-        accordionRef.current,
-        {
-          y: 20,
-          opacity: 0,
-          duration: 0.6,
-        },
-        "-=0.4"
-      )
+      if (accordionRef.current) {
+        tl.from(
+          accordionRef.current,
+          {
+            y: 20,
+            opacity: 0,
+            duration: 0.6,
+          },
+          "-=0.4"
+        )
+      }
 
       // Task input: fade in
-      tl.from(
-        taskRef.current,
-        {
-          y: 20,
-          opacity: 0,
-          duration: 0.6,
-        },
-        "-=0.4"
-      )
+      if (taskRef.current) {
+        tl.from(
+          taskRef.current,
+          {
+            y: 20,
+            opacity: 0,
+            duration: 0.6,
+          },
+          "-=0.4"
+        )
+      }
     })
 
     return () => ctx.revert()
