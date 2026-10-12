@@ -112,12 +112,12 @@ function VerifyCodeForm() {
                   handleVerifyCode()
                 }
               }}
-              className={`h-[50px] text-[16px] sm:text-[20px] px-[24px] rounded-[16px] tracking-[-0.02em] placeholder:text-[#120902]/80 placeholder:font-semibold focus-visible:ring-0 focus-visible:ring-offset-0 transition-all ${
+              className={`h-[50px] text-[16px] sm:text-[20px] px-[24px] rounded-[16px] tracking-[-0.02em] placeholder:text-[#120902]/80 placeholder:font-semibold focus-visible:ring-0 focus-visible:ring-offset-0 transition-all autofill:bg-[rgba(255,175,105,0.08)] autofill:text-[#120902]/95 autofill:border-[#FFAF69] autofill:shadow-[0_0_0_1000px_rgba(255,175,105,0.08)_inset] ${
                 codeError
                   ? "bg-[#DF3E0D]/8 border-[2px] border-[#DF3E0D] text-[#120902]/60"
                   : code
-                    ? "bg-[rgba(255,175,105,0.08)] border-[#FFAF69] text-[#120902]/95 font-semibold"
-                    : "bg-[#120902]/5 border-transparent hover:border-[#120902]/30 focus:border-[#FFAF69] text-[#120902]/95"
+                    ? "bg-[rgba(255,175,105,0.08)] border-[2px] border-[#FFAF69] text-[#120902]/95 font-semibold"
+                    : "bg-[#120902]/5 border-[2px] border-transparent hover:border-[#120902]/30 focus:border-[#FFAF69] text-[#120902]/95"
               }`}
               maxLength={6}
             />
