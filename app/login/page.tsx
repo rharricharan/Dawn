@@ -65,10 +65,11 @@ export default function LoginPage() {
         {/* Heading */}
         <div className="text-center space-y-2">
           <h1 className="text-3xl font-semibold tracking-tight">
-            Welcome back
+            Create your free account
           </h1>
           <p className="text-muted-foreground">
-            Sign in to continue to Dawn.
+            Create your free account to get started.<br />
+            No credit card required.
           </p>
         </div>
 
@@ -86,7 +87,7 @@ export default function LoginPage() {
           <Button
             variant="outline"
             size="lg"
-            className="w-full h-12 text-base bg-white/50 border-border/50"
+            className="w-full h-12 text-base bg-transparent border-[#151515]/20 rounded-full"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
           >
@@ -136,13 +137,13 @@ export default function LoginPage() {
                 handleEmailContinue()
               }
             }}
-            className="h-12 text-base bg-white/50 border-border/50"
+            className="h-12 text-base bg-[#151515]/5 border-none rounded-lg placeholder:text-[#151515]/60 placeholder:font-medium"
           />
 
           {/* Continue Button */}
           <Button
             size="lg"
-            className="w-full h-12 text-base"
+            className="w-full h-12 text-base rounded-full"
             onClick={handleEmailContinue}
             disabled={isLoading}
           >
