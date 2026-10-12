@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect, Suspense } from "react"
 import Link from "next/link"
 import { useSearchParams } from "next/navigation"
 import { gsap } from "gsap"
@@ -10,7 +10,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { verifyOtp } from "@/lib/auth/actions"
 import { Loader2, AlertCircle } from "lucide-react"
 
-export default function VerifyCodePage() {
+function VerifyCodeForm() {
   const searchParams = useSearchParams()
   const email = searchParams.get("email") || ""
   const [isLoading, setIsLoading] = useState(false)
@@ -164,5 +164,17 @@ export default function VerifyCodePage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function VerifyCodePage() {
+  return (
+    <Suspense fallback={
+      <div className="flex min-h-screen items-center justify-center">
+        <Loader2 className="h-8 w-8 animate-spin" />
+      </div>
+    }>
+      <VerifyCodeForm />
+    </Suspense>
   )
 }

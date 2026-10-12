@@ -82,9 +82,11 @@ export async function sendEmailOtp(email: string) {
   })
 
   if (error) {
+    console.error("Supabase OTP error:", error)
     return { error: error.message }
   }
 
+  console.log("OTP sent successfully to:", email)
   return { success: true }
 }
 
