@@ -184,7 +184,7 @@ export default function LoginPage() {
                   handleEmailContinue()
                 }
               }}
-              className={`h-[50px] text-[16px] sm:text-[20px] px-[24px] rounded-[16px] tracking-[-0.02em] placeholder:text-[#120902]/80 placeholder:font-semibold focus-visible:ring-0 focus-visible:ring-offset-0 transition-all autofill:bg-[rgba(255,175,105,0.08)] autofill:text-[#120902]/95 autofill:border-[#FFAF69] autofill:shadow-[0_0_0_1000px_rgba(255,175,105,0.08)_inset] ${
+              className={`h-[50px] text-[18px] sm:text-[22px] px-[24px] rounded-[16px] tracking-[-0.02em] placeholder:text-[#120902]/80 placeholder:font-semibold focus-visible:ring-0 focus-visible:ring-offset-0 transition-all autofill:bg-[rgba(255,175,105,0.08)] autofill:text-[#120902]/95 autofill:border-[#FFAF69] autofill:shadow-[0_0_0_1000px_rgba(255,175,105,0.08)_inset] ${
                 emailError
                   ? "bg-[#DF3E0D]/8 border-[2px] border-[#DF3E0D] text-[#120902]/60"
                   : email
