@@ -940,7 +940,7 @@ export default function StatusPage() {
             </div>
             <div className="flex items-center gap-[8px]">
               <Badge variant="outline" className="text-[11px]">
-                Last scan: {new Date(Date.now() - 2 * 60 * 60 * 1000).toLocaleTimeString()}
+                Last scan: 2 hours ago
               </Badge>
             </div>
           </div>
