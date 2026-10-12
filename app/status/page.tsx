@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react"
 import { Badge } from "@/components/ui/badge"
-import { AlertCircle, CheckCircle2, RefreshCw, ArrowLeft, Shield, Activity, Clock, TrendingUp, AlertTriangle, Bell, MessageSquare, ExternalLink, Users, Server, Zap, Mail } from "lucide-react"
+import { AlertCircle, CheckCircle2, RefreshCw, ArrowLeft, Shield, Activity, Clock, TrendingUp, AlertTriangle, Bell, MessageSquare, ExternalLink, Users, Server, Zap, Mail, Bot, Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -11,6 +11,9 @@ import { ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Line, LineChart, Area, AreaChart, ComposedChart, ResponsiveContainer, Cell } from "recharts"
 import Link from "next/link"
 import { gsap } from "gsap"
+import { HealthTimeline } from "@/components/status/HealthTimeline"
+import { IncidentHistoryLog } from "@/components/status/IncidentHistory"
+import { type IncidentHistory } from "@/lib/ai/incident-handler"
 
 interface ServiceStatus {
   name: string
@@ -76,6 +79,9 @@ export default function StatusPage() {
   const [errors, setErrors] = useState<ErrorLog[]>([])
   const [incidents, setIncidents] = useState<IncidentDetail[]>([])
   const [vulnerabilities, setVulnerabilities] = useState<VulnerabilityItem[]>([])
+  const [incidentHistory, setIncidentHistory] = useState<IncidentHistory[]>([])
+  const [healthTimeline, setHealthTimeline] = useState<any[]>([])
+  const [aiStats, setAiStats] = useState<any>(null)
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [selectedIncident, setSelectedIncident] = useState<IncidentDetail | null>(null)
@@ -285,6 +291,14 @@ export default function StatusPage() {
           cvssScore: 3.1
         }
       ])
+
+      // Fetch AI incident history
+      const historyResponse = await fetch('/api/incidents/history')
+      const historyData = await historyResponse.json()
+
+      setIncidentHistory(historyData.incidents || [])
+      setHealthTimeline(historyData.timeline || [])
+      setAiStats(historyData.stats || null)
 
       setLastUpdated(new Date())
     } catch (error) {
@@ -1022,6 +1036,132 @@ export default function StatusPage() {
             </div>
           )}
         </div>
+
+        {/* AI Incident Management Stats */}
+        {aiStats && (
+          <div className="bg-gradient-to-br from-[#FFAF69]/10 via-[#EED0FF]/5 to-transparent rounded-[24px] p-[32px] border border-[#FFAF69]/20">
+            <div className="flex items-center gap-[12px] mb-[24px]">
+              <div className="p-[12px] bg-[#FFAF69]/20 rounded-[16px]">
+                <Bot className="h-[24px] w-[24px] text-[#FFAF69]" />
+              </div>
+              <div>
+                <h2 className="text-[24px] font-semibold tracking-[-0.02em] text-[#120902]">
+                  AI Incident Management
+                </h2>
+                <p className="text-[14px] text-[#120902]/60">
+                  Automated issue detection, analysis, and resolution
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-[16px]">
+              <div className="p-[20px] bg-white/80 rounded-[16px] border border-[#120902]/10">
+                <div className="flex items-center gap-[8px] mb-[8px]">
+                  <Sparkles className="h-[16px] w-[16px] text-[#FFAF69]" />
+                  <p className="text-[12px] text-[#120902]/60 font-medium">AI Success Rate</p>
+                </div>
+                <p className="text-[32px] font-semibold text-[#FFAF69] tracking-[-0.03em]">
+                  {aiStats.aiSuccessRate}%
+                </p>
+                <p className="text-[11px] text-[#120902]/50 mt-[4px]">
+                  {aiStats.aiResolved} / {aiStats.resolved} resolved by AI
+                </p>
+              </div>
+
+              <div className="p-[20px] bg-white/80 rounded-[16px] border border-[#120902]/10">
+                <div className="flex items-center gap-[8px] mb-[8px]">
+                  <CheckCircle2 className="h-[16px] w-[16px] text-[#FFAF69]" />
+                  <p className="text-[12px] text-[#120902]/60 font-medium">Total Resolved</p>
+                </div>
+                <p className="text-[32px] font-semibold text-[#120902] tracking-[-0.03em]">
+                  {aiStats.resolved}
+                </p>
+                <p className="text-[11px] text-[#120902]/50 mt-[4px]">
+                  of {aiStats.total} total incidents
+                </p>
+              </div>
+
+              <div className="p-[20px] bg-white/80 rounded-[16px] border border-[#120902]/10">
+                <div className="flex items-center gap-[8px] mb-[8px]">
+                  <Clock className="h-[16px] w-[16px] text-[#FFAF69]" />
+                  <p className="text-[12px] text-[#120902]/60 font-medium">Avg Resolution</p>
+                </div>
+                <p className="text-[32px] font-semibold text-[#120902] tracking-[-0.03em]">
+                  {aiStats.avgResolutionTime}
+                </p>
+                <p className="text-[11px] text-[#120902]/50 mt-[4px]">
+                  from detection to fix
+                </p>
+              </div>
+
+              <div className="p-[20px] bg-white/80 rounded-[16px] border border-[#120902]/10">
+                <div className="flex items-center gap-[8px] mb-[8px]">
+                  <AlertCircle className="h-[16px] w-[16px] text-[#DF3E0D]" />
+                  <p className="text-[12px] text-[#120902]/60 font-medium">Active Issues</p>
+                </div>
+                <p className="text-[32px] font-semibold text-[#DF3E0D] tracking-[-0.03em]">
+                  {aiStats.inProgress + aiStats.open}
+                </p>
+                <p className="text-[11px] text-[#120902]/50 mt-[4px]">
+                  {aiStats.inProgress} in progress, {aiStats.open} open
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* System Health Timeline */}
+        {healthTimeline.length > 0 && (
+          <div className="bg-white/60 backdrop-blur-sm rounded-[24px] p-[24px] sm:p-[32px] border border-[#120902]/10">
+            <div className="flex items-center gap-[12px] mb-[24px]">
+              <Activity className="h-[24px] w-[24px] text-[#FFAF69]" />
+              <div>
+                <h2 className="text-[24px] font-semibold tracking-[-0.02em] text-[#120902]">
+                  System Health Timeline
+                </h2>
+                <p className="text-[14px] text-[#120902]/60">
+                  Daily health score and incident tracking over the last 30 days
+                </p>
+              </div>
+            </div>
+            <HealthTimeline data={healthTimeline} />
+          </div>
+        )}
+
+        {/* AI Incident History */}
+        {incidentHistory.length > 0 && (
+          <div className="bg-white/60 backdrop-blur-sm rounded-[24px] p-[24px] sm:p-[32px] border border-[#120902]/10">
+            <div className="flex items-center justify-between mb-[8px] flex-wrap gap-[16px]">
+              <div>
+                <h2 className="text-[24px] font-semibold tracking-[-0.02em] text-[#120902]">
+                  Incident Resolution History
+                </h2>
+                <p className="text-[14px] text-[#120902]/60 mt-[4px]">
+                  Complete log of all incidents with AI and manual resolutions
+                </p>
+              </div>
+              <div className="flex items-center gap-[8px]">
+                <Badge variant="outline" className="text-[12px]">
+                  <Bot className="h-[12px] w-[12px] mr-[6px]" />
+                  {incidentHistory.filter(i => i.resolvedBy === "ai").length} AI-resolved
+                </Badge>
+                <Badge variant="outline" className="text-[12px]">
+                  {incidentHistory.length} total
+                </Badge>
+              </div>
+            </div>
+            <div className="mt-[24px]">
+              <IncidentHistoryLog incidents={incidentHistory.slice(0, 10)} />
+              {incidentHistory.length > 10 && (
+                <div className="text-center mt-[16px]">
+                  <p className="text-[13px] text-[#120902]/50">
+                    Showing 10 of {incidentHistory.length} incidents
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* All Issues & Error Log */}
         <div className="bg-white/60 backdrop-blur-sm rounded-[24px] p-[24px] sm:p-[32px] border border-[#120902]/10">
