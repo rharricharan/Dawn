@@ -90,7 +90,7 @@ export default function LoginPage() {
           <Button
             variant="outline"
             size="lg"
-            className="w-full h-12 text-base bg-transparent border-[#151515]/20 rounded-full hover:bg-[#151515]/10 transition-colors"
+            className="w-full h-[50px] text-base bg-transparent border-[#151515]/20 rounded-full hover:bg-[#151515]/10 transition-colors"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
           >
@@ -144,7 +144,7 @@ export default function LoginPage() {
                   handleEmailContinue()
                 }
               }}
-              className={`h-12 text-base px-6 rounded-2xl placeholder:text-[#151515]/60 placeholder:font-medium focus-visible:ring-0 focus-visible:ring-offset-0 transition-all border-transparent ${
+              className={`h-[50px] text-base px-6 rounded-2xl placeholder:text-[#151515]/70 placeholder:font-medium focus-visible:ring-0 focus-visible:ring-offset-0 transition-all border-transparent ${
                 emailError
                   ? "bg-[#DF3E0D]/8 shadow-[0_0_0_2px_#DF3E0D] text-[#151515]/60"
                   : "bg-[#151515]/8 hover:shadow-[0_0_0_2px_rgba(21,21,21,0.02)] focus:shadow-[0_0_0_2px_#151515]"
@@ -159,7 +159,7 @@ export default function LoginPage() {
           <div className="border-beam rounded-full">
             <Button
               size="lg"
-              className="w-full h-12 text-base rounded-full hover:scale-[1.01] transition-transform relative z-10"
+              className="w-full h-[50px] text-base rounded-full hover:scale-[1.01] transition-transform relative z-10"
               onClick={handleEmailContinue}
               disabled={isLoading}
             >
