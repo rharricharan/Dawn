@@ -97,7 +97,7 @@ export default function LoginPage() {
   }
 
   return (
-    <PageTransition>
+    <PageTransition isHeroPage={true}>
       <div className="flex min-h-screen items-center justify-center px-[16px] py-[32px] sm:px-[24px] md:px-[32px]">
       <div className="w-full max-w-[448px] flex flex-col gap-[32px]">
         {/* Logo */}
