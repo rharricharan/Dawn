@@ -74,12 +74,13 @@ export default function PageTransition({ children, isHeroPage = false }: PageTra
           duration: 0.9,
           ease: "power3.inOut",
         }, "-=0.6")
+        .addLabel("logoComplete") // Mark when logo is done
         // Wait for logo to fully settle, then animate content
         .to(heading, {
           opacity: 1,
           y: 0,
           duration: 0.6,
-        }, "+=0.0") // Start right after logo finishes
+        }, "logoComplete+=0.1") // Start 0.1s after logo completes
         .to(subtext, {
           opacity: 1,
           y: 0,
