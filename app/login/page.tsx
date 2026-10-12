@@ -144,10 +144,10 @@ export default function LoginPage() {
                   handleEmailContinue()
                 }
               }}
-              className={`h-12 text-base px-6 rounded-2xl placeholder:text-[#151515]/60 placeholder:font-medium focus-visible:ring-0 focus-visible:ring-offset-0 transition-all ${
+              className={`h-12 text-base px-6 rounded-2xl placeholder:text-[#151515]/60 placeholder:font-medium focus-visible:ring-0 focus-visible:ring-offset-0 transition-all border-transparent ${
                 emailError
-                  ? "bg-[#DF3E0D]/8 border-[#DF3E0D] border-2 text-[#151515]/60"
-                  : "bg-[#151515]/8 border-transparent hover:border-[#151515] hover:border-2 focus:border-[#151515] focus:border-2"
+                  ? "bg-[#DF3E0D]/8 shadow-[0_0_0_2px_#DF3E0D] text-[#151515]/60"
+                  : "bg-[#151515]/8 hover:shadow-[0_0_0_2px_rgba(21,21,21,0.1)] focus:shadow-[0_0_0_2px_#151515]"
               }`}
             />
             {emailError && (
