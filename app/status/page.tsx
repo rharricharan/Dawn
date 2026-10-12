@@ -77,7 +77,7 @@ export default function StatusPage() {
   const [incidents, setIncidents] = useState<IncidentDetail[]>([])
   const [vulnerabilities, setVulnerabilities] = useState<VulnerabilityItem[]>([])
   const [loading, setLoading] = useState(true)
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null)
   const [selectedIncident, setSelectedIncident] = useState<IncidentDetail | null>(null)
   const [showReportDialog, setShowReportDialog] = useState(false)
   const [showSubscribeDialog, setShowSubscribeDialog] = useState(false)
@@ -310,6 +310,7 @@ export default function StatusPage() {
   }
 
   useEffect(() => {
+    setLastUpdated(new Date())
     fetchStatus()
     const interval = setInterval(fetchStatus, 30000)
     return () => clearInterval(interval)
@@ -409,7 +410,7 @@ export default function StatusPage() {
           <div className="flex items-center justify-between flex-wrap gap-[16px]">
             <div className="flex items-center gap-[12px]">
               <p className="text-[12px] text-[#120902]/60">
-                Last updated: {lastUpdated.toLocaleTimeString()}
+                Last updated: {lastUpdated ? lastUpdated.toLocaleTimeString() : 'Loading...'}
               </p>
               <Button
                 variant="outline"
@@ -424,15 +425,9 @@ export default function StatusPage() {
             </div>
             <div className="flex items-center gap-[12px]">
               <Dialog open={showSubscribeDialog} onOpenChange={setShowSubscribeDialog}>
-                <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="rounded-full border-[#FFAF69]/30 bg-[rgba(255,175,105,0.05)] hover:bg-[rgba(255,175,105,0.1)] hover:border-[#FFAF69] transition-all cursor-pointer"
-                  >
-                    <Bell className="h-[14px] w-[14px] mr-[8px]" />
-                    <span className="text-[14px] font-semibold text-[#FFAF69]">Subscribe to Updates</span>
-                  </Button>
+                <DialogTrigger className="group/button inline-flex shrink-0 items-center justify-center border bg-clip-padding font-medium whitespace-nowrap outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 h-7 gap-1 px-2.5 text-[0.8rem] rounded-full border-[#FFAF69]/30 bg-[rgba(255,175,105,0.05)] hover:bg-[rgba(255,175,105,0.1)] hover:border-[#FFAF69] transition-all cursor-pointer">
+                  <Bell className="h-[14px] w-[14px] mr-[8px]" />
+                  <span className="text-[14px] font-semibold text-[#FFAF69]">Subscribe to Updates</span>
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[500px] bg-[#fcf7f4] border-[#120902]/20">
                   <DialogHeader>
@@ -466,14 +461,9 @@ export default function StatusPage() {
                 </DialogContent>
               </Dialog>
               <Dialog open={showReportDialog} onOpenChange={setShowReportDialog}>
-                <DialogTrigger asChild>
-                  <Button
-                    size="sm"
-                    className="rounded-full font-semibold cursor-pointer"
-                  >
-                    <MessageSquare className="h-[14px] w-[14px] mr-[8px]" />
-                    Report Problem
-                  </Button>
+                <DialogTrigger className="group/button inline-flex shrink-0 items-center justify-center border border-transparent bg-clip-padding whitespace-nowrap transition-all outline-none select-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 active:not-aria-[haspopup]:translate-y-px disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground hover:bg-primary/80 h-7 gap-1 px-2.5 text-[0.8rem] rounded-full font-semibold cursor-pointer">
+                  <MessageSquare className="h-[14px] w-[14px] mr-[8px]" />
+                  Report Problem
                 </DialogTrigger>
                 <DialogContent className="sm:max-w-[600px] bg-[#fcf7f4] border-[#120902]/20">
                   <DialogHeader>
