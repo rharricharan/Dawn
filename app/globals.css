@@ -127,6 +127,16 @@
     @apply font-sans;
   }
 
+  ::selection {
+    background-color: #FFAF69;
+    color: #151515;
+  }
+
+  ::-moz-selection {
+    background-color: #FFAF69;
+    color: #151515;
+  }
+
   button,
   a,
   [role="button"],
