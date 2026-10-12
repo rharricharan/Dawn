@@ -70,3 +70,37 @@ export async function signOut() {
   revalidatePath("/", "layout")
   redirect("/login")
 }
+
+export async function sendEmailOtp(email: string) {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase.auth.signInWithOtp({
+    email,
+    options: {
+      shouldCreateUser: true,
+    },
+  })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  return { success: true }
+}
+
+export async function verifyOtp(email: string, token: string) {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase.auth.verifyOtp({
+    email,
+    token,
+    type: "email",
+  })
+
+  if (error) {
+    return { error: error.message }
+  }
+
+  revalidatePath("/", "layout")
+  redirect("/")
+}

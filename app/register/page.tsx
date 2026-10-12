@@ -7,7 +7,7 @@ import { gsap } from "gsap"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { signInWithGoogle } from "@/lib/auth/actions"
+import { signInWithGoogle, sendEmailOtp } from "@/lib/auth/actions"
 import { Loader2, AlertCircle } from "lucide-react"
 
 export default function LoginPage() {
@@ -38,11 +38,13 @@ export default function LoginPage() {
     }
   }
 
-  const handleEmailContinue = () => {
+  const handleEmailContinue = async () => {
     setEmailError(null)
+    setIsLoading(true)
 
     if (!email) {
       setEmailError("Email is required.")
+      setIsLoading(false)
       return
     }
 
@@ -50,11 +52,25 @@ export default function LoginPage() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
       setEmailError("Please enter a valid email address.")
+      setIsLoading(false)
       return
     }
 
-    // Redirect to register with email pre-filled
-    router.push(`/register?email=${encodeURIComponent(email)}`)
+    try {
+      const result = await sendEmailOtp(email)
+
+      if (result?.error) {
+        setError("We're having trouble sending the code. Please try again.")
+        setIsLoading(false)
+      } else {
+        // Redirect to verification page with email
+        router.push(`/verify-code?email=${encodeURIComponent(email)}`)
+      }
+    } catch (err) {
+      console.error("Send OTP error:", err)
+      setError("We're experiencing technical difficulties. Please try again.")
+      setIsLoading(false)
+    }
   }
 
   const handleGoogleButtonHover = (isHovering: boolean) => {
