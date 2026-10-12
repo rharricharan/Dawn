@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { signInWithGoogle, sendEmailOtp } from "@/lib/auth/actions"
 import { Loader2, AlertCircle } from "lucide-react"
+import PageTransition from "@/components/transitions/PageTransition"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -96,7 +97,8 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center px-[16px] py-[32px] sm:px-[24px] md:px-[32px]">
+    <PageTransition>
+      <div className="flex min-h-screen items-center justify-center px-[16px] py-[32px] sm:px-[24px] md:px-[32px]">
       <div className="w-full max-w-[448px] flex flex-col gap-[32px]">
         {/* Logo */}
         <div className="flex justify-center">
@@ -255,5 +257,6 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+    </PageTransition>
   )
 }
