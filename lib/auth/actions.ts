@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 import { createClient } from "@/lib/supabase/server"
+import * as Sentry from "@sentry/nextjs"
 
 export async function signIn(formData: FormData) {
   const supabase = await createClient()
@@ -56,6 +57,9 @@ export async function signInWithGoogle() {
   })
 
   if (error) {
+    Sentry.captureException(error, {
+      tags: { auth_method: "google_oauth" },
+    })
     return { error: error.message }
   }
 
@@ -81,6 +85,10 @@ export async function sendEmailOtp(email: string) {
 
   if (error) {
     console.error("Supabase OTP error:", error)
+    Sentry.captureException(error, {
+      tags: { auth_method: "otp_send" },
+      user: { email },
+    })
     return { error: error.message }
   }
 
@@ -98,7 +106,19 @@ export async function verifyOtp(email: string, token: string) {
   })
 
   if (error) {
+    Sentry.captureException(error, {
+      tags: { auth_method: "otp" },
+      user: { email },
+    })
     return { error: error.message }
+  }
+
+  // Set user context in Sentry for future error tracking
+  if (data.user) {
+    Sentry.setUser({
+      id: data.user.id,
+      email: data.user.email,
+    })
   }
 
   revalidatePath("/", "layout")
