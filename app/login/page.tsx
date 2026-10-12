@@ -67,7 +67,7 @@ export default function LoginPage() {
           <h1 className="text-3xl font-semibold tracking-tight">
             Create your free account
           </h1>
-          <p className="text-muted-foreground text-base">
+          <p className="text-muted-foreground text-base font-medium">
             Create your free account to get started.<br />
             No credit card required.
           </p>
@@ -141,12 +141,13 @@ export default function LoginPage() {
           />
 
           {/* Continue Button */}
-          <Button
-            size="lg"
-            className="w-full h-12 text-base rounded-full border-beam hover:scale-[1.01] transition-transform"
-            onClick={handleEmailContinue}
-            disabled={isLoading}
-          >
+          <div className="border-beam rounded-full">
+            <Button
+              size="lg"
+              className="w-full h-12 text-base rounded-full hover:scale-[1.01] transition-transform relative z-10"
+              onClick={handleEmailContinue}
+              disabled={isLoading}
+            >
             {isLoading ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -156,6 +157,7 @@ export default function LoginPage() {
               "Continue"
             )}
           </Button>
+          </div>
 
           {/* Terms */}
           <p className="text-xs text-center text-muted-foreground">

@@ -129,16 +129,38 @@
 }
 
 @layer utilities {
-  @keyframes border-beam {
-    0%, 100% {
-      box-shadow: 0 0 0 1px rgba(21, 21, 21, 0.1);
+  @keyframes border-beam-spin {
+    0% {
+      transform: rotate(0deg);
     }
-    50% {
-      box-shadow: 0 0 0 2px rgba(21, 21, 21, 0.15);
+    100% {
+      transform: rotate(360deg);
     }
   }
 
   .border-beam {
-    animation: border-beam 2s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .border-beam::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 9999px;
+    padding: 2px;
+    background: conic-gradient(
+      from 0deg,
+      transparent 0%,
+      transparent 40%,
+      rgba(21, 21, 21, 0.3) 50%,
+      transparent 60%,
+      transparent 100%
+    );
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: border-beam-spin 3s linear infinite;
+    pointer-events: none;
   }
 }
