@@ -63,11 +63,11 @@ export default function LoginPage() {
         </div>
 
         {/* Heading */}
-        <div className="text-center space-y-2">
+        <div className="text-center space-y-3">
           <h1 className="text-3xl font-semibold tracking-tight">
             Create your free account
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-muted-foreground text-base">
             Create your free account to get started.<br />
             No credit card required.
           </p>
@@ -87,7 +87,7 @@ export default function LoginPage() {
           <Button
             variant="outline"
             size="lg"
-            className="w-full h-12 text-base bg-transparent border-[#151515]/20 rounded-full"
+            className="w-full h-12 text-base bg-transparent border-[#151515]/20 rounded-full hover:bg-[#151515]/10 transition-colors"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
           >
@@ -119,10 +119,10 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-border/50" />
+              <span className="w-full border-t border-[#151515]/20" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-background px-2 text-muted-foreground">or</span>
+              <span className="bg-background px-2 text-[#151515]/70">or</span>
             </div>
           </div>
 
@@ -137,13 +137,13 @@ export default function LoginPage() {
                 handleEmailContinue()
               }
             }}
-            className="h-12 text-base bg-[#151515]/5 border-none rounded-lg placeholder:text-[#151515]/60 placeholder:font-medium"
+            className="h-12 text-base px-6 bg-[#151515]/5 border-transparent rounded-lg placeholder:text-[#151515]/60 placeholder:font-medium hover:border-[#151515] hover:border-2 focus:border-[#151515] focus:border-2 focus-visible:ring-0 focus-visible:ring-offset-0 transition-all"
           />
 
           {/* Continue Button */}
           <Button
             size="lg"
-            className="w-full h-12 text-base rounded-full"
+            className="w-full h-12 text-base rounded-full border-beam hover:scale-[1.01] transition-transform"
             onClick={handleEmailContinue}
             disabled={isLoading}
           >

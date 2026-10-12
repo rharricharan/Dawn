@@ -127,3 +127,18 @@
     @apply font-sans;
   }
 }
+
+@layer utilities {
+  @keyframes border-beam {
+    0%, 100% {
+      box-shadow: 0 0 0 1px rgba(21, 21, 21, 0.1);
+    }
+    50% {
+      box-shadow: 0 0 0 2px rgba(21, 21, 21, 0.15);
+    }
+  }
+
+  .border-beam {
+    animation: border-beam 2s ease-in-out infinite;
+  }
+}
