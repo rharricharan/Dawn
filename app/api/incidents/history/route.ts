@@ -1,94 +1,33 @@
 import { NextResponse } from "next/server"
 import { type IncidentHistory, generateMonthlyTimeline } from "@/lib/ai/incident-handler"
 
-// Mock incident history data (in production, this would come from a database)
-function generateMockIncidents(): IncidentHistory[] {
-  const incidents: IncidentHistory[] = []
-  const categories = ["Database", "Authentication", "API", "Cache", "Email"]
-  const titles = [
-    "Connection timeout",
-    "Rate limit exceeded",
-    "Invalid token",
-    "Query performance degradation",
-    "Cache miss rate high",
-    "Email delivery failed",
-    "SSL certificate expiring",
-    "Memory usage spike",
-  ]
-
-  // Generate incidents for the last 30 days
-  const now = new Date()
-  for (let i = 0; i < 45; i++) {
-    const daysAgo = Math.floor(Math.random() * 30)
-    const detectedAt = new Date(now)
-    detectedAt.setDate(detectedAt.getDate() - daysAgo)
-
-    const severity = ["low", "low", "medium", "medium", "high", "critical"][
-      Math.floor(Math.random() * 6)
-    ] as "low" | "medium" | "high" | "critical"
-
-    const isResolved = Math.random() > 0.3 // 70% resolved
-    const resolvedBy = Math.random() > 0.4 ? "ai" : "human" as "ai" | "human"
-
-    const resolvedAt = isResolved
-      ? new Date(detectedAt.getTime() + Math.random() * 2 * 60 * 60 * 1000)
-      : undefined
-
-    incidents.push({
-      id: `inc_${Date.now()}_${i}`,
-      title: titles[Math.floor(Math.random() * titles.length)],
-      severity,
-      detectedAt: detectedAt.toISOString(),
-      resolvedAt: resolvedAt?.toISOString(),
-      resolvedBy: isResolved ? resolvedBy : undefined,
-      category: categories[Math.floor(Math.random() * categories.length)],
-      affectedUsers: Math.floor(Math.random() * 100),
-      status: isResolved ? "resolved" : Math.random() > 0.5 ? "in_progress" : "open",
-      resolution: isResolved
-        ? {
-            incidentId: `inc_${Date.now()}_${i}`,
-            status: "resolved",
-            analysis: "Root cause identified and fixed",
-            solution:
-              resolvedBy === "ai"
-                ? "Automatically applied configuration update"
-                : "Manual intervention applied",
-            steps: [
-              "Identified root cause",
-              "Applied fix",
-              "Verified resolution",
-              "Monitoring for recurrence",
-            ],
-            timestamp: resolvedAt.toISOString(),
-            aiConfidence: resolvedBy === "ai" ? 85 + Math.random() * 15 : 0,
-            requiresHumanReview: resolvedBy === "human",
-          }
-        : undefined,
-    })
-  }
-
-  return incidents.sort(
-    (a, b) => new Date(b.detectedAt).getTime() - new Date(a.detectedAt).getTime()
-  )
+// In production, this would fetch from your database
+// For now, returns empty until real incidents are stored
+function getStoredIncidents(): IncidentHistory[] {
+  // TODO: Replace with actual database query
+  // Example: return await db.incidents.findMany({ orderBy: { detectedAt: 'desc' } })
+  return []
 }
 
 export async function GET() {
   try {
-    const incidents = generateMockIncidents()
+    // Get real incidents from storage (currently empty, will populate as AI analyzes real errors)
+    const incidents = getStoredIncidents()
     const timeline = generateMonthlyTimeline(incidents)
+
+    const resolved = incidents.filter((i) => i.status === "resolved")
+    const aiResolved = incidents.filter((i) => i.resolvedBy === "ai")
 
     const stats = {
       total: incidents.length,
-      resolved: incidents.filter((i) => i.status === "resolved").length,
-      aiResolved: incidents.filter((i) => i.resolvedBy === "ai").length,
+      resolved: resolved.length,
+      aiResolved: aiResolved.length,
       inProgress: incidents.filter((i) => i.status === "in_progress").length,
       open: incidents.filter((i) => i.status === "open").length,
-      avgResolutionTime: "2.3 hours",
-      aiSuccessRate: Math.round(
-        (incidents.filter((i) => i.resolvedBy === "ai").length /
-          incidents.filter((i) => i.status === "resolved").length) *
-          100
-      ),
+      avgResolutionTime: incidents.length > 0 ? calculateAvgResolutionTime(incidents) : "0m",
+      aiSuccessRate: resolved.length > 0
+        ? Math.round((aiResolved.length / resolved.length) * 100)
+        : 0,
     }
 
     return NextResponse.json({
@@ -103,4 +42,23 @@ export async function GET() {
       { status: 500 }
     )
   }
+}
+
+function calculateAvgResolutionTime(incidents: IncidentHistory[]): string {
+  const resolved = incidents.filter(i => i.resolvedAt && i.detectedAt)
+
+  if (resolved.length === 0) return "0m"
+
+  const totalMinutes = resolved.reduce((sum, inc) => {
+    const detected = new Date(inc.detectedAt).getTime()
+    const resolvedTime = new Date(inc.resolvedAt!).getTime()
+    return sum + Math.floor((resolvedTime - detected) / 60000)
+  }, 0)
+
+  const avgMinutes = Math.floor(totalMinutes / resolved.length)
+
+  if (avgMinutes < 60) return `${avgMinutes}m`
+  const hours = Math.floor(avgMinutes / 60)
+  const mins = avgMinutes % 60
+  return `${hours}h ${mins}m`
 }
