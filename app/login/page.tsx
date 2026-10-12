@@ -147,7 +147,7 @@ export default function LoginPage() {
               className={`h-12 text-base px-6 rounded-2xl placeholder:text-[#151515]/60 placeholder:font-medium focus-visible:ring-0 focus-visible:ring-offset-0 transition-all border-transparent ${
                 emailError
                   ? "bg-[#DF3E0D]/8 shadow-[0_0_0_2px_#DF3E0D] text-[#151515]/60"
-                  : "bg-[#151515]/8 hover:shadow-[0_0_0_2px_rgba(21,21,21,0.1)] focus:shadow-[0_0_0_2px_#151515]"
+                  : "bg-[#151515]/8 hover:shadow-[0_0_0_2px_rgba(21,21,21,0.05)] focus:shadow-[0_0_0_2px_#151515]"
               }`}
             />
             {emailError && (
