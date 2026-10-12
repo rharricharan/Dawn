@@ -128,12 +128,12 @@
   }
 
   ::selection {
-    background-color: #FFAF69;
+    background-color: rgba(255, 175, 105, 0.8);
     color: #151515;
   }
 
   ::-moz-selection {
-    background-color: #FFAF69;
+    background-color: rgba(255, 175, 105, 0.8);
     color: #151515;
   }
 
