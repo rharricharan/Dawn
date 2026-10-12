@@ -90,7 +90,7 @@ export default function LoginPage() {
           <Button
             variant="outline"
             size="lg"
-            className="w-full h-[50px] text-[16px] font-semibold tracking-[-0.02em] bg-transparent border-[#120902]/15 rounded-full hover:bg-[#120902]/5 hover:border-[#120902]/30 transition-colors text-foreground/80"
+            className="w-full h-[50px] text-[16px] font-semibold tracking-[-0.02em] bg-transparent border-[#120902]/15 rounded-full hover:rounded-[16px] hover:bg-[#120902]/5 hover:border-[#120902]/30 transition-all text-foreground/80"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
           >
@@ -156,10 +156,10 @@ export default function LoginPage() {
           </div>
 
           {/* Continue Button */}
-          <div className="border-beam rounded-full">
+          <div className="border-beam rounded-full hover:rounded-[16px] transition-all">
             <Button
               size="lg"
-              className="w-full h-[54px] text-[16px] font-semibold tracking-[-0.02em] rounded-full hover:scale-[1.01] transition-transform relative z-10"
+              className="w-full h-[54px] text-[16px] font-semibold tracking-[-0.02em] rounded-full hover:rounded-[16px] hover:scale-[1.01] transition-all relative z-10"
               onClick={handleEmailContinue}
               disabled={isLoading}
             >
