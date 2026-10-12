@@ -67,7 +67,7 @@ export default function LoginPage() {
 
         {/* Heading */}
         <div className="text-center space-y-3">
-          <h1 className="text-3xl font-semibold tracking-tight">
+          <h1 className="text-2xl font-semibold tracking-[-0.03em]">
             Create your free account
           </h1>
           <p className="text-muted-foreground text-base font-medium">
