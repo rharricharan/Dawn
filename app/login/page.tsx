@@ -55,7 +55,11 @@ export default function LoginPage() {
       <div className="w-full max-w-md space-y-8">
         {/* Logo */}
         <div className="flex justify-center">
-          <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-orange-400 via-pink-400 to-pink-300" />
+          <img
+            src="/dawn-logo.svg"
+            alt="Dawn"
+            className="h-16 w-auto"
+          />
         </div>
 
         {/* Heading */}
