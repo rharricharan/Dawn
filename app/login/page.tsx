@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { gsap } from "gsap"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Alert, AlertDescription } from "@/components/ui/alert"
@@ -15,6 +16,9 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null)
   const [email, setEmail] = useState("")
   const [emailError, setEmailError] = useState<string | null>(null)
+  const googleButtonRef = useRef<HTMLButtonElement>(null)
+  const continueButtonRef = useRef<HTMLButtonElement>(null)
+  const continueWrapperRef = useRef<HTMLDivElement>(null)
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
@@ -53,6 +57,28 @@ export default function LoginPage() {
     router.push(`/register?email=${encodeURIComponent(email)}`)
   }
 
+  const handleGoogleButtonHover = (isHovering: boolean) => {
+    if (!googleButtonRef.current) return
+
+    gsap.to(googleButtonRef.current, {
+      borderRadius: isHovering ? "16px" : "9999px",
+      backgroundColor: isHovering ? "rgba(18, 9, 2, 0.05)" : "transparent",
+      borderColor: isHovering ? "rgba(18, 9, 2, 0.3)" : "rgba(18, 9, 2, 0.15)",
+      duration: 0.05,
+      ease: "power1.out"
+    })
+  }
+
+  const handleContinueButtonHover = (isHovering: boolean) => {
+    if (!continueButtonRef.current || !continueWrapperRef.current) return
+
+    gsap.to([continueButtonRef.current, continueWrapperRef.current], {
+      borderRadius: isHovering ? "16px" : "9999px",
+      duration: 0.05,
+      ease: "power1.out"
+    })
+  }
+
   return (
     <div className="flex min-h-screen items-center justify-center px-[16px] py-[32px] sm:px-[24px] md:px-[32px]">
       <div className="w-full max-w-[448px] flex flex-col gap-[32px]">
@@ -88,10 +114,13 @@ export default function LoginPage() {
         <div className="flex flex-col gap-[24px]">
           {/* Continue with Gmail */}
           <Button
+            ref={googleButtonRef}
             variant="outline"
             size="lg"
-            className="w-full h-[50px] text-[16px] font-semibold tracking-[-0.02em] bg-transparent border-[#120902]/15 rounded-full hover:rounded-[16px] hover:bg-[#120902]/5 hover:border-[#120902]/30 transition-all text-foreground/80"
+            className="w-full h-[50px] text-[16px] font-semibold tracking-[-0.02em] bg-transparent border-[#120902]/15 rounded-full text-foreground/80"
             onClick={handleGoogleSignIn}
+            onMouseEnter={() => handleGoogleButtonHover(true)}
+            onMouseLeave={() => handleGoogleButtonHover(false)}
             disabled={isLoading}
           >
             {isLoading ? (
@@ -144,10 +173,10 @@ export default function LoginPage() {
                   handleEmailContinue()
                 }
               }}
-              className={`h-[50px] text-[16px] sm:text-[20px] px-[24px] rounded-[16px] placeholder:text-[#120902]/80 placeholder:font-medium focus-visible:ring-0 focus-visible:ring-offset-0 transition-all ${
+              className={`h-[50px] text-[16px] sm:text-[20px] px-[24px] rounded-[16px] tracking-[-0.02em] placeholder:text-[#120902]/80 placeholder:font-semibold focus-visible:ring-0 focus-visible:ring-offset-0 transition-all ${
                 emailError
                   ? "bg-[#DF3E0D]/8 border-[2px] border-[#DF3E0D] text-[#120902]/60"
-                  : `bg-[#120902]/8 border-transparent hover:border-[#120902]/30 focus:border-[#120902] text-[#120902] ${email ? 'font-semibold' : ''}`
+                  : `bg-[#120902]/5 border-transparent hover:border-[#120902]/30 focus:border-[#120902] text-[#120902]/95 ${email ? 'font-semibold' : ''}`
               }`}
             />
             {emailError && (
@@ -156,11 +185,14 @@ export default function LoginPage() {
           </div>
 
           {/* Continue Button */}
-          <div className="border-beam rounded-full hover:rounded-[16px] transition-all">
+          <div ref={continueWrapperRef} className="border-beam rounded-full">
             <Button
+              ref={continueButtonRef}
               size="lg"
-              className="w-full h-[54px] text-[16px] font-semibold tracking-[-0.02em] rounded-full hover:rounded-[16px] hover:scale-[1.01] transition-all relative z-10"
+              className="w-full h-[54px] text-[16px] font-semibold tracking-[-0.02em] rounded-full relative z-10"
               onClick={handleEmailContinue}
+              onMouseEnter={() => handleContinueButtonHover(true)}
+              onMouseLeave={() => handleContinueButtonHover(false)}
               disabled={isLoading}
             >
               {isLoading ? (
@@ -194,7 +226,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-[16px] text-center font-semibold text-[#120902]/70">
+        <p className="text-[14px] text-center font-semibold text-[#120902]/70 tracking-[-0.03em]">
           Don't have an account yet?{" "}
           <Link
             href="/register"
