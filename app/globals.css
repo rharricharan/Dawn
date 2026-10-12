@@ -126,6 +126,19 @@
   html {
     @apply font-sans;
   }
+
+  button,
+  a,
+  [role="button"],
+  [type="button"],
+  [type="submit"] {
+    cursor: pointer;
+  }
+
+  button:disabled,
+  a:disabled {
+    cursor: not-allowed;
+  }
 }
 
 @layer utilities {
