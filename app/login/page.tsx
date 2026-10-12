@@ -175,7 +175,7 @@ export default function LoginPage() {
           </div>
 
           {/* Terms */}
-          <p className="text-[12px] text-center text-muted-foreground leading-[1.5]">
+          <p className="text-[12px] text-center text-muted-foreground leading-[1.5] tracking-[0px]">
             By continuing, you agree to Dawn's{" "}
             <Link
               href="/terms"
@@ -194,11 +194,11 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-[14px] text-center text-muted-foreground">
+        <p className="text-[16px] text-center font-semibold text-[#120902]/70">
           Don't have an account yet?{" "}
           <Link
             href="/register"
-            className="font-semibold underline hover:text-foreground transition-colors"
+            className="underline hover:text-foreground transition-colors"
           >
             Register
           </Link>
