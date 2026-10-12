@@ -1,11 +1,13 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, useRef } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/skeleton"
-import { AlertCircle, CheckCircle2, Clock, RefreshCw } from "lucide-react"
+import { AlertCircle, CheckCircle2, Clock, RefreshCw, ArrowLeft } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import Link from "next/link"
+import { gsap } from "gsap"
 
 interface ServiceStatus {
   name: string
@@ -28,6 +30,7 @@ export default function StatusPage() {
   const [errors, setErrors] = useState<ErrorLog[]>([])
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const fetchStatus = async () => {
     setLoading(true)
@@ -72,6 +75,23 @@ export default function StatusPage() {
     return () => clearInterval(interval)
   }, [])
 
+  useEffect(() => {
+    if (!containerRef.current) return
+
+    // Animate page entrance
+    gsap.fromTo(
+      containerRef.current.children,
+      { opacity: 0, y: 20 },
+      {
+        opacity: 1,
+        y: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: "power2.out"
+      }
+    )
+  }, [])
+
   const getStatusColor = (status: string) => {
     switch (status) {
       case "operational":
@@ -98,159 +118,174 @@ export default function StatusPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-8">
-      <div className="max-w-6xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-4xl font-bold tracking-tight">System Status</h1>
-            <p className="text-muted-foreground mt-2">
-              Monitor service health and recent errors
+    <div className="min-h-screen bg-[#fcf7f4] px-[16px] py-[32px] sm:px-[24px] md:px-[32px]">
+      <div ref={containerRef} className="max-w-[1200px] mx-auto space-y-[32px]">
+        {/* Header with Logo */}
+        <div className="flex flex-col gap-[24px]">
+          <Link href="/register" className="inline-flex items-center text-[14px] text-[#120902]/70 hover:text-[#120902] transition-colors font-semibold">
+            <ArrowLeft className="mr-[8px] h-[16px] w-[16px]" />
+            Back to app
+          </Link>
+
+          <div className="flex justify-center">
+            <img
+              src="/dawn-logo.svg"
+              alt="Dawn"
+              className="h-[56px] w-auto sm:h-[64px]"
+            />
+          </div>
+
+          <div className="text-center">
+            <h1 className="text-[32px] sm:text-[40px] font-semibold tracking-[-0.03em] leading-[1.2] text-[#120902]">
+              System Status
+            </h1>
+            <p className="text-[#120902]/70 mt-[12px] text-[14px] font-medium">
+              Monitor service health and system performance
             </p>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={fetchStatus}
-            disabled={loading}
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
+
+          <div className="flex items-center justify-between">
+            <p className="text-[12px] text-[#120902]/60">
+              Last updated: {lastUpdated.toLocaleTimeString()}
+            </p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={fetchStatus}
+              disabled={loading}
+              className="rounded-full border-[#120902]/15 bg-transparent hover:bg-[#120902]/5 hover:border-[#120902]/30 transition-all"
+            >
+              <RefreshCw className={`h-[14px] w-[14px] mr-[8px] ${loading ? 'animate-spin' : ''}`} />
+              <span className="text-[14px] font-semibold">Refresh</span>
+            </Button>
+          </div>
         </div>
 
-        {/* Last Updated */}
-        <p className="text-sm text-muted-foreground">
-          Last updated: {lastUpdated.toLocaleTimeString()}
-        </p>
+        {/* Service Status */}
+        <div className="bg-white/60 backdrop-blur-sm rounded-[24px] p-[24px] sm:p-[32px] border border-[#120902]/10">
+          <h2 className="text-[24px] font-semibold tracking-[-0.02em] text-[#120902] mb-[8px]">
+            Service Status
+          </h2>
+          <p className="text-[14px] text-[#120902]/60 mb-[24px]">
+            Current operational status of all services
+          </p>
 
-        {/* Overall Status */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Service Status</CardTitle>
-            <CardDescription>Current operational status of all services</CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-16 w-full" />
-                ))}
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {services.map((service) => (
-                  <div
-                    key={service.name}
-                    className="flex items-center justify-between p-4 border rounded-lg"
-                  >
-                    <div className="flex items-center gap-3">
-                      {getStatusIcon(service.status)}
-                      <div>
-                        <p className="font-semibold">{service.name}</p>
-                        {service.description && (
-                          <p className="text-sm text-muted-foreground">
-                            {service.description}
-                          </p>
-                        )}
-                      </div>
+          {loading ? (
+            <div className="space-y-[16px]">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-[72px] bg-[#120902]/5 rounded-[16px] animate-pulse" />
+              ))}
+            </div>
+          ) : (
+            <div className="space-y-[12px]">
+              {services.map((service) => (
+                <div
+                  key={service.name}
+                  className="flex items-center justify-between p-[20px] bg-white rounded-[16px] border border-[#120902]/10 hover:border-[#FFAF69]/50 transition-all"
+                >
+                  <div className="flex items-center gap-[16px]">
+                    {getStatusIcon(service.status)}
+                    <div>
+                      <p className="font-semibold text-[16px] text-[#120902] tracking-[-0.01em]">
+                        {service.name}
+                      </p>
+                      {service.description && (
+                        <p className="text-[14px] text-[#120902]/60 mt-[4px]">
+                          {service.description}
+                        </p>
+                      )}
                     </div>
-                    <Badge className={getStatusColor(service.status)}>
-                      {service.status}
-                    </Badge>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  <div className={`px-[16px] py-[6px] rounded-full text-[12px] font-semibold ${getStatusColor(service.status)}`}>
+                    {service.status}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Recent Errors */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Errors</CardTitle>
-            <CardDescription>
-              Errors tracked by our monitoring system
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {loading ? (
-              <div className="space-y-3">
-                {[1, 2, 3].map((i) => (
-                  <Skeleton key={i} className="h-20 w-full" />
-                ))}
+        <div className="bg-white/60 backdrop-blur-sm rounded-[24px] p-[24px] sm:p-[32px] border border-[#120902]/10">
+          <h2 className="text-[24px] font-semibold tracking-[-0.02em] text-[#120902] mb-[8px]">
+            Recent Issues
+          </h2>
+          <p className="text-[14px] text-[#120902]/60 mb-[24px]">
+            Errors tracked by our monitoring system
+          </p>
+
+          {loading ? (
+            <div className="space-y-[16px]">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="h-[96px] bg-[#120902]/5 rounded-[16px] animate-pulse" />
+              ))}
+            </div>
+          ) : errors.length === 0 ? (
+            <div className="text-center py-[48px]">
+              <div className="inline-flex p-[16px] bg-[rgba(255,175,105,0.1)] rounded-full mb-[16px]">
+                <CheckCircle2 className="h-[32px] w-[32px] text-[#FFAF69]" />
               </div>
-            ) : errors.length === 0 ? (
-              <div className="text-center py-8">
-                <CheckCircle2 className="h-12 w-12 text-green-600 mx-auto mb-2" />
-                <p className="text-lg font-semibold">No Errors Detected</p>
-                <p className="text-sm text-muted-foreground">
-                  All systems operating normally
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {errors.map((error) => (
-                  <div
-                    key={error.id}
-                    className="p-4 border rounded-lg space-y-2"
-                  >
-                    <div className="flex items-start justify-between">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <p className="font-semibold">{error.title}</p>
-                          <Badge variant={error.status === "resolved" ? "secondary" : "destructive"}>
-                            {error.status}
-                          </Badge>
-                        </div>
-                        <p className="text-sm text-muted-foreground mt-1">
-                          Occurred {error.count} time{error.count !== 1 ? 's' : ''}
+              <p className="text-[18px] font-semibold text-[#120902] mb-[8px]">No Errors Detected</p>
+              <p className="text-[14px] text-[#120902]/60">
+                All systems operating normally
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-[12px]">
+              {errors.map((error) => (
+                <div
+                  key={error.id}
+                  className="p-[20px] bg-white rounded-[16px] border border-[#120902]/10 space-y-[12px] hover:border-[#FFAF69]/50 transition-all"
+                >
+                  <div className="flex items-start justify-between gap-[16px]">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-[12px] flex-wrap">
+                        <p className="font-semibold text-[16px] text-[#120902] tracking-[-0.01em]">
+                          {error.title}
                         </p>
+                        <div className={`px-[12px] py-[4px] rounded-full text-[11px] font-semibold ${
+                          error.status === "resolved"
+                            ? "bg-[rgba(255,175,105,0.1)] text-[#FFAF69]"
+                            : "bg-[#DF3E0D]/10 text-[#DF3E0D]"
+                        }`}>
+                          {error.status}
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex gap-4 text-xs text-muted-foreground">
-                      <span>First seen: {new Date(error.firstSeen).toLocaleString()}</span>
-                      <span>Last seen: {new Date(error.lastSeen).toLocaleString()}</span>
+                      <p className="text-[14px] text-[#120902]/60 mt-[4px]">
+                        Occurred {error.count} time{error.count !== 1 ? 's' : ''}
+                      </p>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+                  <div className="flex flex-wrap gap-[16px] text-[12px] text-[#120902]/50">
+                    <span>First: {new Date(error.firstSeen).toLocaleString()}</span>
+                    <span>Last: {new Date(error.lastSeen).toLocaleString()}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Error Metrics */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Total Errors (24h)</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">
-                {errors.reduce((sum, e) => sum + e.count, 0)}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Unresolved Issues</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold">
-                {errors.filter(e => e.status === "unresolved").length}
-              </p>
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="pb-2">
-              <CardDescription>Resolved (24h)</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-3xl font-bold text-green-600">
-                {errors.filter(e => e.status === "resolved").length}
-              </p>
-            </CardContent>
-          </Card>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-[16px]">
+          <div className="bg-white/60 backdrop-blur-sm rounded-[24px] p-[24px] border border-[#120902]/10">
+            <p className="text-[14px] text-[#120902]/60 mb-[8px] font-medium">Total Errors (24h)</p>
+            <p className="text-[40px] font-semibold text-[#120902] tracking-[-0.03em]">
+              {errors.reduce((sum, e) => sum + e.count, 0)}
+            </p>
+          </div>
+          <div className="bg-white/60 backdrop-blur-sm rounded-[24px] p-[24px] border border-[#120902]/10">
+            <p className="text-[14px] text-[#120902]/60 mb-[8px] font-medium">Unresolved Issues</p>
+            <p className="text-[40px] font-semibold text-[#DF3E0D] tracking-[-0.03em]">
+              {errors.filter(e => e.status === "unresolved").length}
+            </p>
+          </div>
+          <div className="bg-white/60 backdrop-blur-sm rounded-[24px] p-[24px] border border-[#120902]/10">
+            <p className="text-[14px] text-[#120902]/60 mb-[8px] font-medium">Resolved (24h)</p>
+            <p className="text-[40px] font-semibold text-[#FFAF69] tracking-[-0.03em]">
+              {errors.filter(e => e.status === "resolved").length}
+            </p>
+          </div>
         </div>
       </div>
     </div>
