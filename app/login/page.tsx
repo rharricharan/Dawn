@@ -10,7 +10,6 @@ import { Alert, AlertDescription } from "@/components/ui/alert"
 import { signInWithGoogle, sendEmailOtp } from "@/lib/auth/actions"
 import { Loader2, AlertCircle } from "lucide-react"
 import PageTransition from "@/components/transitions/PageTransition"
-import * as Sentry from "@sentry/nextjs"
 
 export default function LoginPage() {
   const router = useRouter()
@@ -249,21 +248,6 @@ export default function LoginPage() {
             Register
           </Link>
         </p>
-
-        {/* TEST BUTTON - Remove after testing Sentry */}
-        <Button
-          variant="outline"
-          onClick={() => {
-            Sentry.captureException(new Error("🧪 Sentry Test Error - Working!"), {
-              tags: { test: true, location: "login_page" },
-              level: "info",
-            })
-            alert("Test error sent to Sentry! Check your dashboard.")
-          }}
-          className="mt-4"
-        >
-          🧪 Test Sentry Error Tracking
-        </Button>
       </div>
     </div>
     </PageTransition>
