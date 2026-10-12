@@ -115,7 +115,9 @@ function VerifyCodeForm() {
               className={`h-[50px] text-[16px] sm:text-[20px] px-[24px] rounded-[16px] tracking-[-0.02em] placeholder:text-[#120902]/80 placeholder:font-semibold focus-visible:ring-0 focus-visible:ring-offset-0 transition-all ${
                 codeError
                   ? "bg-[#DF3E0D]/8 border-[2px] border-[#DF3E0D] text-[#120902]/60"
-                  : `bg-[#120902]/5 border-transparent hover:border-[#120902]/30 focus:border-[#120902] text-[#120902]/95 ${code ? 'font-semibold' : ''}`
+                  : code
+                    ? "bg-[rgba(255,175,105,0.08)] border-[#FFAF69] text-[#120902]/95 font-semibold"
+                    : "bg-[#120902]/5 border-transparent hover:border-[#120902]/30 focus:border-[#FFAF69] text-[#120902]/95"
               }`}
               maxLength={6}
             />

@@ -74,11 +74,9 @@ export async function signOut() {
 export async function sendEmailOtp(email: string) {
   const supabase = await createClient()
 
+  // Try without shouldCreateUser first
   const { data, error } = await supabase.auth.signInWithOtp({
     email,
-    options: {
-      shouldCreateUser: true,
-    },
   })
 
   if (error) {
