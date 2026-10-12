@@ -74,50 +74,18 @@ export default function PageTransition({ children, isHeroPage = false }: PageTra
           duration: 0.9,
           ease: "power3.inOut",
         }, "-=0.6")
-
-        // Split heading and subheading into characters for animation
-        if (heading) {
-          const headingText = heading.textContent || ""
-          heading.innerHTML = headingText.split("").map(char =>
-            `<span style="display: inline-block; opacity: 0;">${char === " " ? "&nbsp;" : char}</span>`
-          ).join("")
-
-          const headingChars = heading.querySelectorAll("span")
-
-          // Animate heading characters as logo settles
-          tl.to(headingChars, {
-            opacity: 1,
-            y: 0,
-            duration: 0.05,
-            stagger: {
-              each: 0.03,
-              ease: "power2.out"
-            },
-            ease: "back.out(1.5)",
-          }, "-=0.35") // Start just before logo settles
-        }
-
-        if (subtext) {
-          const subtextText = subtext.textContent || ""
-          subtext.innerHTML = subtextText.split("").map(char =>
-            `<span style="display: inline-block; opacity: 0;">${char === " " ? "&nbsp;" : char}</span>`
-          ).join("")
-
-          const subtextChars = subtext.querySelectorAll("span")
-
-          tl.to(subtextChars, {
-            opacity: 1,
-            y: 0,
-            duration: 0.04,
-            stagger: {
-              each: 0.02,
-              ease: "power2.out"
-            },
-            ease: "power2.out",
-          }, "-=0.5") // Overlap with heading
-        }
-
-        tl.to(form, {
+        // Wait for logo to fully settle, then animate content
+        .to(heading, {
+          opacity: 1,
+          y: 0,
+          duration: 0.6,
+        }, "+=0.0") // Start right after logo finishes
+        .to(subtext, {
+          opacity: 1,
+          y: 0,
+          duration: 0.5,
+        }, "-=0.4")
+        .to(form, {
           opacity: 1,
           y: 0,
           duration: 0.6,
