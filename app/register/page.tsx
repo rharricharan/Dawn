@@ -1,123 +1,26 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { useSearchParams } from "next/navigation"
-import { gsap } from "gsap"
+import { useState, useRef } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { gsap } from "gsap"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { signUp, signInWithGoogle } from "@/lib/auth/actions"
-import { ArrowLeft, Sparkles, Loader2, AlertCircle } from "lucide-react"
+import { signInWithGoogle } from "@/lib/auth/actions"
+import { Loader2, AlertCircle } from "lucide-react"
 
-export default function RegisterPage() {
-  const searchParams = useSearchParams()
+export default function LoginPage() {
+  const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [email, setEmail] = useState("")
-  const containerRef = useRef<HTMLDivElement>(null)
-  const iconRef = useRef<HTMLDivElement>(null)
-  const headingRef = useRef<HTMLHeadingElement>(null)
-  const formRef = useRef<HTMLFormElement>(null)
-  const footerRef = useRef<HTMLDivElement>(null)
+  const [emailError, setEmailError] = useState<string | null>(null)
+  const googleButtonRef = useRef<HTMLButtonElement>(null)
+  const continueButtonRef = useRef<HTMLButtonElement>(null)
+  const continueWrapperRef = useRef<HTMLDivElement>(null)
 
-  // Pre-fill email from query parameter
-  useEffect(() => {
-    const emailParam = searchParams.get("email")
-    if (emailParam) {
-      setEmail(emailParam)
-    }
-  }, [searchParams])
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        defaults: { ease: "power3.out", clearProps: "all" }
-      })
-
-      if (iconRef.current) {
-        tl.from(iconRef.current, {
-          scale: 0,
-          rotation: -180,
-          opacity: 0,
-          duration: 0.8,
-          ease: "back.out(1.7)",
-          clearProps: "all",
-        })
-      }
-
-      if (headingRef.current) {
-        tl.from(
-          headingRef.current,
-          {
-            y: 20,
-            opacity: 0,
-            duration: 0.6,
-            clearProps: "all",
-          },
-          "-=0.4"
-        )
-      }
-
-      if (formRef.current) {
-        tl.from(
-          formRef.current.children,
-          {
-            y: 20,
-            opacity: 0,
-            duration: 0.5,
-            stagger: 0.1,
-            clearProps: "all",
-          },
-          "-=0.3"
-        )
-      }
-
-      if (footerRef.current) {
-        tl.from(
-          footerRef.current,
-          {
-            y: 10,
-            opacity: 0,
-            duration: 0.5,
-            clearProps: "all",
-          },
-          "-=0.2"
-        )
-      }
-    })
-
-    return () => {}
-  }, [])
-
-  const handleSignUp = async (formData: FormData) => {
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      const result = await signUp(formData)
-
-      if (result?.error) {
-        // Friendly error messages
-        if (result.error.includes("already registered") || result.error.includes("already exists")) {
-          setError("Looks like you already have an account! Try signing in instead.")
-        } else if (result.error.includes("password")) {
-          setError("Please choose a stronger password (at least 6 characters).")
-        } else {
-          setError("We're having trouble creating your account. Please try again or use Google sign-up.")
-        }
-        setIsLoading(false)
-      }
-    } catch (err) {
-      console.error("Sign up error:", err)
-      setError("We're experiencing technical difficulties. Please try again in a moment.")
-      setIsLoading(false)
-    }
-  }
-
-  const handleGoogleSignUp = async () => {
+  const handleGoogleSignIn = async () => {
     setIsLoading(true)
     setError(null)
 
@@ -129,113 +32,101 @@ export default function RegisterPage() {
         setIsLoading(false)
       }
     } catch (err) {
-      console.error("Google sign-up error:", err)
-      setError("We're experiencing technical difficulties. Please try again or use email sign-up.")
+      console.error("Google sign-in error:", err)
+      setError("We're experiencing technical difficulties. Please try again or use a different sign-in method.")
       setIsLoading(false)
     }
   }
 
-  return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">
-      <div ref={containerRef} className="w-full max-w-md space-y-8">
-        {/* Back button */}
-        <Link
-          href="/login"
-          className="inline-flex items-center text-sm text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to login
-        </Link>
+  const handleEmailContinue = () => {
+    setEmailError(null)
 
-        {/* Logo/Icon */}
-        <div ref={iconRef} className="flex justify-center">
-          <div className="rounded-full bg-primary/10 p-6">
-            <Sparkles className="h-12 w-12 text-primary" />
-          </div>
+    if (!email) {
+      setEmailError("Email is required.")
+      return
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setEmailError("Please enter a valid email address.")
+      return
+    }
+
+    // Redirect to register with email pre-filled
+    router.push(`/register?email=${encodeURIComponent(email)}`)
+  }
+
+  const handleGoogleButtonHover = (isHovering: boolean) => {
+    if (!googleButtonRef.current) return
+
+    gsap.to(googleButtonRef.current, {
+      borderRadius: isHovering ? "16px" : "9999px",
+      backgroundColor: isHovering ? "rgba(18, 9, 2, 0.05)" : "transparent",
+      borderColor: isHovering ? "rgba(18, 9, 2, 0.3)" : "rgba(18, 9, 2, 0.15)",
+      duration: 0.05,
+      ease: "power1.out"
+    })
+  }
+
+  const handleContinueButtonHover = (isHovering: boolean) => {
+    if (!continueButtonRef.current || !continueWrapperRef.current) return
+
+    gsap.to([continueButtonRef.current, continueWrapperRef.current], {
+      borderRadius: isHovering ? "16px" : "9999px",
+      duration: 0.05,
+      ease: "power1.out"
+    })
+  }
+
+  return (
+    <div className="flex min-h-screen items-center justify-center px-[16px] py-[32px] sm:px-[24px] md:px-[32px]">
+      <div className="w-full max-w-[448px] flex flex-col gap-[32px]">
+        {/* Logo */}
+        <div className="flex justify-center">
+          <img
+            src="/dawn-logo.svg"
+            alt="Dawn"
+            className="h-[56px] w-auto sm:h-[64px]"
+          />
         </div>
 
         {/* Heading */}
-        <div ref={headingRef} className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">Create your account</h1>
-          <p className="text-muted-foreground">
-            Start finding your next design clients
+        <div className="text-center flex flex-col gap-[12px]">
+          <h1 className="text-[28px] sm:text-[32px] font-semibold tracking-[-0.03em] leading-[1.2]">
+            Create your free account
+          </h1>
+          <p className="text-muted-foreground text-[14px] font-medium leading-[1.5]">
+            Create your free account to get started.<br />
+            No credit card required.
           </p>
         </div>
 
         {/* Error Alert */}
         {error && (
           <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
+            <AlertCircle className="h-[16px] w-[16px]" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
-        {/* Registration Form */}
-        <form ref={formRef} action={handleSignUp} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Full name</Label>
-            <Input
-              id="name"
-              name="name"
-              placeholder="John Doe"
-              type="text"
-              required
-              autoComplete="name"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input
-              id="email"
-              name="email"
-              placeholder="you@example.com"
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              autoComplete="email"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
-            <Input
-              id="password"
-              name="password"
-              placeholder="Create a strong password"
-              type="password"
-              required
-              autoComplete="new-password"
-              minLength={6}
-            />
-          </div>
-
-          <Button type="submit" size="lg" className="w-full" disabled={isLoading}>
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Creating account...
-              </>
-            ) : (
-              "Create account"
-            )}
-          </Button>
-
-          <Separator className="my-4" />
-
+        {/* Auth Form */}
+        <div className="flex flex-col gap-[24px]">
+          {/* Continue with Gmail */}
           <Button
+            ref={googleButtonRef}
             variant="outline"
             size="lg"
-            className="w-full"
-            type="button"
-            onClick={handleGoogleSignUp}
+            className="w-full h-[50px] text-[16px] font-semibold tracking-[-0.02em] bg-transparent border-[#120902]/15 rounded-full text-foreground/80"
+            onClick={handleGoogleSignIn}
+            onMouseEnter={() => handleGoogleButtonHover(true)}
+            onMouseLeave={() => handleGoogleButtonHover(false)}
             disabled={isLoading}
           >
             {isLoading ? (
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              <Loader2 className="mr-[8px] h-[20px] w-[20px] animate-spin" />
             ) : (
-              <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
+              <svg className="mr-[8px] h-[20px] w-[20px]" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -254,19 +145,75 @@ export default function RegisterPage() {
                 />
               </svg>
             )}
-            Sign up with Gmail
+            Continue with Gmail
           </Button>
-        </form>
 
-        {/* Footer */}
-        <div ref={footerRef} className="text-center">
-          <p className="text-xs text-muted-foreground">
-            By creating an account, you agree to our{" "}
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-[#120902]/20" />
+            </div>
+            <div className="relative flex justify-center text-[12px]">
+              <span className="bg-background px-[8px] text-[#120902]/70">or</span>
+            </div>
+          </div>
+
+          {/* Email Input */}
+          <div className="flex flex-col gap-[12px]">
+            <Input
+              type="email"
+              placeholder="Enter email address"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                if (emailError) setEmailError(null)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleEmailContinue()
+                }
+              }}
+              className={`h-[50px] text-[16px] sm:text-[20px] px-[24px] rounded-[16px] tracking-[-0.02em] placeholder:text-[#120902]/80 placeholder:font-semibold focus-visible:ring-0 focus-visible:ring-offset-0 transition-all ${
+                emailError
+                  ? "bg-[#DF3E0D]/8 border-[2px] border-[#DF3E0D] text-[#120902]/60"
+                  : `bg-[#120902]/5 border-transparent hover:border-[#120902]/30 focus:border-[#120902] text-[#120902]/95 ${email ? 'font-semibold' : ''}`
+              }`}
+            />
+            {emailError && (
+              <p className="text-[14px] text-[#A23F21]">{emailError}</p>
+            )}
+          </div>
+
+          {/* Continue Button */}
+          <div ref={continueWrapperRef} className="border-beam rounded-full">
+            <Button
+              ref={continueButtonRef}
+              size="lg"
+              className="w-full h-[54px] text-[16px] font-semibold tracking-[-0.02em] rounded-full relative z-10"
+              onClick={handleEmailContinue}
+              onMouseEnter={() => handleContinueButtonHover(true)}
+              onMouseLeave={() => handleContinueButtonHover(false)}
+              disabled={isLoading}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-[8px] h-[16px] w-[16px] animate-spin" />
+                  Continue...
+                </>
+              ) : (
+                "Continue"
+              )}
+            </Button>
+          </div>
+
+          {/* Terms */}
+          <p className="text-[12px] text-center text-muted-foreground leading-[1.5] tracking-[0px]">
+            By continuing, you agree to Dawn's{" "}
             <Link
               href="/terms"
               className="underline hover:text-foreground transition-colors"
             >
-              Terms of Service
+              Terms of service
             </Link>{" "}
             and{" "}
             <Link
@@ -277,6 +224,17 @@ export default function RegisterPage() {
             </Link>
           </p>
         </div>
+
+        {/* Footer */}
+        <p className="text-[14px] text-center font-semibold text-[#120902]/70 tracking-[-0.03em]">
+          Already have an account?{" "}
+          <Link
+            href="/login"
+            className="underline hover:text-foreground transition-colors"
+          >
+            Log in
+          </Link>
+        </p>
       </div>
     </div>
   )

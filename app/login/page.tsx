@@ -18,7 +18,6 @@ export default function LoginPage() {
   const [emailError, setEmailError] = useState<string | null>(null)
   const googleButtonRef = useRef<HTMLButtonElement>(null)
   const continueButtonRef = useRef<HTMLButtonElement>(null)
-  const continueWrapperRef = useRef<HTMLDivElement>(null)
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
@@ -53,8 +52,8 @@ export default function LoginPage() {
       return
     }
 
-    // Redirect to register with email pre-filled
-    router.push(`/register?email=${encodeURIComponent(email)}`)
+    // TODO: Handle email login flow
+    console.log("Email login:", email)
   }
 
   const handleGoogleButtonHover = (isHovering: boolean) => {
@@ -70,9 +69,9 @@ export default function LoginPage() {
   }
 
   const handleContinueButtonHover = (isHovering: boolean) => {
-    if (!continueButtonRef.current || !continueWrapperRef.current) return
+    if (!continueButtonRef.current) return
 
-    gsap.to([continueButtonRef.current, continueWrapperRef.current], {
+    gsap.to(continueButtonRef.current, {
       borderRadius: isHovering ? "16px" : "9999px",
       duration: 0.05,
       ease: "power1.out"
@@ -92,14 +91,10 @@ export default function LoginPage() {
         </div>
 
         {/* Heading */}
-        <div className="text-center flex flex-col gap-[12px]">
+        <div className="text-center">
           <h1 className="text-[28px] sm:text-[32px] font-semibold tracking-[-0.03em] leading-[1.2]">
-            Create your free account
+            Welcome back, let's jam!
           </h1>
-          <p className="text-muted-foreground text-[14px] font-medium leading-[1.5]">
-            Create your free account to get started.<br />
-            No credit card required.
-          </p>
         </div>
 
         {/* Error Alert */}
@@ -185,26 +180,24 @@ export default function LoginPage() {
           </div>
 
           {/* Continue Button */}
-          <div ref={continueWrapperRef} className="border-beam rounded-full">
-            <Button
-              ref={continueButtonRef}
-              size="lg"
-              className="w-full h-[54px] text-[16px] font-semibold tracking-[-0.02em] rounded-full relative z-10"
-              onClick={handleEmailContinue}
-              onMouseEnter={() => handleContinueButtonHover(true)}
-              onMouseLeave={() => handleContinueButtonHover(false)}
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <>
-                  <Loader2 className="mr-[8px] h-[16px] w-[16px] animate-spin" />
-                  Continue...
-                </>
-              ) : (
-                "Continue"
-              )}
-            </Button>
-          </div>
+          <Button
+            ref={continueButtonRef}
+            size="lg"
+            className="w-full h-[54px] text-[16px] font-semibold tracking-[-0.02em] rounded-full relative z-10"
+            onClick={handleEmailContinue}
+            onMouseEnter={() => handleContinueButtonHover(true)}
+            onMouseLeave={() => handleContinueButtonHover(false)}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-[8px] h-[16px] w-[16px] animate-spin" />
+                Continue...
+              </>
+            ) : (
+              "Continue"
+            )}
+          </Button>
 
           {/* Terms */}
           <p className="text-[12px] text-center text-muted-foreground leading-[1.5] tracking-[0px]">
