@@ -49,13 +49,13 @@
 
 :root {
   --background: #fcf7f4;
-  --foreground: oklch(0.145 0 0);
+  --foreground: #120902;
   --card: oklch(1 0 0);
   --card-foreground: oklch(0.145 0 0);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.12 0 0);
-  --primary-foreground: oklch(0.985 0 0);
+  --primary: #120902;
+  --primary-foreground: #fcf7f4;
   --secondary: oklch(0.97 0 0);
   --secondary-foreground: oklch(0.205 0 0);
   --muted: oklch(0.97 0 0);
@@ -129,12 +129,12 @@
 
   ::selection {
     background-color: rgba(255, 175, 105, 0.8);
-    color: #151515;
+    color: #120902;
   }
 
   ::-moz-selection {
     background-color: rgba(255, 175, 105, 0.8);
-    color: #151515;
+    color: #120902;
   }
 
   button,

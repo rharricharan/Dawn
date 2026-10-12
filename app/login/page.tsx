@@ -90,7 +90,7 @@ export default function LoginPage() {
           <Button
             variant="outline"
             size="lg"
-            className="w-full h-[50px] text-base font-semibold tracking-[-0.02em] bg-transparent border-[#151515]/10 rounded-full hover:bg-[#151515]/5 transition-colors text-foreground/80"
+            className="w-full h-[50px] text-base font-semibold tracking-[-0.02em] bg-transparent border-[#120902]/10 rounded-full hover:bg-[#120902]/5 transition-colors text-foreground/80"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
           >
@@ -122,10 +122,10 @@ export default function LoginPage() {
           {/* Divider */}
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-[#151515]/20" />
+              <span className="w-full border-t border-[#120902]/20" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-background px-2 text-[#151515]/70">or</span>
+              <span className="bg-background px-2 text-[#120902]/70">or</span>
             </div>
           </div>
 
@@ -144,10 +144,10 @@ export default function LoginPage() {
                   handleEmailContinue()
                 }
               }}
-              className={`h-[50px] text-xl px-6 rounded-2xl placeholder:text-[#151515]/80 placeholder:font-medium focus-visible:ring-0 focus-visible:ring-offset-0 transition-all ${
+              className={`h-[50px] text-xl px-6 rounded-2xl placeholder:text-[#120902]/80 placeholder:font-medium focus-visible:ring-0 focus-visible:ring-offset-0 transition-all ${
                 emailError
-                  ? "bg-[#DF3E0D]/8 border-[2px] border-[#DF3E0D] text-[#151515]/60"
-                  : `bg-[#151515]/8 border-transparent hover:border-[#151515]/30 focus:border-[#151515] text-[#151515] ${email ? 'font-semibold' : ''}`
+                  ? "bg-[#DF3E0D]/8 border-[2px] border-[#DF3E0D] text-[#120902]/60"
+                  : `bg-[#120902]/8 border-transparent hover:border-[#120902]/30 focus:border-[#120902] text-[#120902] ${email ? 'font-semibold' : ''}`
               }`}
             />
             {emailError && (
