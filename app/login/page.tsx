@@ -70,7 +70,7 @@ export default function LoginPage() {
           <h1 className="text-[28px] sm:text-[32px] font-semibold tracking-[-0.03em] leading-[1.2]">
             Create your free account
           </h1>
-          <p className="text-muted-foreground text-[13px] font-medium leading-[1.5]">
+          <p className="text-muted-foreground text-[14px] font-medium leading-[1.5]">
             Create your free account to get started.<br />
             No credit card required.
           </p>
