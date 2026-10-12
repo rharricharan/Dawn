@@ -54,23 +54,23 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8">
+    <div className="flex min-h-screen items-center justify-center px-[16px] py-[32px] sm:px-[24px] md:px-[32px]">
+      <div className="w-full max-w-[448px] flex flex-col gap-[32px]">
         {/* Logo */}
         <div className="flex justify-center">
           <img
             src="/dawn-logo.svg"
             alt="Dawn"
-            className="h-16 w-auto"
+            className="h-[56px] w-auto sm:h-[64px]"
           />
         </div>
 
         {/* Heading */}
-        <div className="text-center space-y-3">
-          <h1 className="text-[32px] font-semibold tracking-[-0.03em]">
+        <div className="text-center flex flex-col gap-[12px]">
+          <h1 className="text-[28px] sm:text-[32px] font-semibold tracking-[-0.03em] leading-[1.2]">
             Create your free account
           </h1>
-          <p className="text-muted-foreground text-[13px] font-medium">
+          <p className="text-muted-foreground text-[13px] font-medium leading-[1.5]">
             Create your free account to get started.<br />
             No credit card required.
           </p>
@@ -79,25 +79,25 @@ export default function LoginPage() {
         {/* Error Alert */}
         {error && (
           <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
+            <AlertCircle className="h-[16px] w-[16px]" />
             <AlertDescription>{error}</AlertDescription>
           </Alert>
         )}
 
         {/* Auth Form */}
-        <div className="space-y-6">
+        <div className="flex flex-col gap-[24px]">
           {/* Continue with Gmail */}
           <Button
             variant="outline"
             size="lg"
-            className="w-full h-[50px] text-base font-semibold tracking-[-0.02em] bg-transparent border-[#120902]/15 rounded-full hover:bg-[#120902]/5 hover:border-[#120902]/30 transition-colors text-foreground/80"
+            className="w-full h-[50px] text-[16px] font-semibold tracking-[-0.02em] bg-transparent border-[#120902]/15 rounded-full hover:bg-[#120902]/5 hover:border-[#120902]/30 transition-colors text-foreground/80"
             onClick={handleGoogleSignIn}
             disabled={isLoading}
           >
             {isLoading ? (
-              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+              <Loader2 className="mr-[8px] h-[20px] w-[20px] animate-spin" />
             ) : (
-              <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
+              <svg className="mr-[8px] h-[20px] w-[20px]" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -124,13 +124,13 @@ export default function LoginPage() {
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-[#120902]/20" />
             </div>
-            <div className="relative flex justify-center text-xs">
-              <span className="bg-background px-2 text-[#120902]/70">or</span>
+            <div className="relative flex justify-center text-[12px]">
+              <span className="bg-background px-[8px] text-[#120902]/70">or</span>
             </div>
           </div>
 
           {/* Email Input */}
-          <div className="space-y-3">
+          <div className="flex flex-col gap-[12px]">
             <Input
               type="email"
               placeholder="Enter email address"
@@ -144,14 +144,14 @@ export default function LoginPage() {
                   handleEmailContinue()
                 }
               }}
-              className={`h-[50px] text-xl px-6 rounded-2xl placeholder:text-[#120902]/80 placeholder:font-medium focus-visible:ring-0 focus-visible:ring-offset-0 transition-all ${
+              className={`h-[50px] text-[20px] px-[24px] rounded-[16px] placeholder:text-[#120902]/80 placeholder:font-medium focus-visible:ring-0 focus-visible:ring-offset-0 transition-all ${
                 emailError
                   ? "bg-[#DF3E0D]/8 border-[2px] border-[#DF3E0D] text-[#120902]/60"
                   : `bg-[#120902]/8 border-transparent hover:border-[#120902]/30 focus:border-[#120902] text-[#120902] ${email ? 'font-semibold' : ''}`
               }`}
             />
             {emailError && (
-              <p className="text-sm text-[#A23F21]">{emailError}</p>
+              <p className="text-[14px] text-[#A23F21]">{emailError}</p>
             )}
           </div>
 
@@ -159,13 +159,13 @@ export default function LoginPage() {
           <div className="border-beam rounded-full">
             <Button
               size="lg"
-              className="w-full h-[54px] text-base font-semibold tracking-[-0.02em] rounded-full hover:scale-[1.01] transition-transform relative z-10"
+              className="w-full h-[54px] text-[16px] font-semibold tracking-[-0.02em] rounded-full hover:scale-[1.01] transition-transform relative z-10"
               onClick={handleEmailContinue}
               disabled={isLoading}
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  <Loader2 className="mr-[8px] h-[16px] w-[16px] animate-spin" />
                   Continue...
                 </>
               ) : (
@@ -175,7 +175,7 @@ export default function LoginPage() {
           </div>
 
           {/* Terms */}
-          <p className="text-xs text-center text-muted-foreground">
+          <p className="text-[12px] text-center text-muted-foreground leading-[1.5]">
             By continuing, you agree to Dawn's{" "}
             <Link
               href="/terms"
@@ -194,7 +194,7 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <p className="text-sm text-center text-muted-foreground">
+        <p className="text-[14px] text-center text-muted-foreground">
           Don't have an account yet?{" "}
           <Link
             href="/register"
