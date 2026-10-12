@@ -159,7 +159,7 @@ export default function LoginPage() {
           <div className="border-beam rounded-full">
             <Button
               size="lg"
-              className="w-full h-[50px] text-base font-semibold tracking-[-0.02em] rounded-full hover:scale-[1.01] transition-transform relative z-10"
+              className="w-full h-[54px] text-base font-semibold tracking-[-0.02em] rounded-full hover:scale-[1.01] transition-transform relative z-10"
               onClick={handleEmailContinue}
               disabled={isLoading}
             >
