@@ -74,11 +74,12 @@ export default function PageTransition({ children, isHeroPage = false }: PageTra
           duration: 0.9,
           ease: "power3.inOut",
         }, "-=0.6")
+        // Wait for logo to settle, then animate content
         .to(heading, {
           opacity: 1,
           y: 0,
           duration: 0.6,
-        }, "-=0.2")
+        }, "+=0.1") // Start after logo finishes
         .to(subtext, {
           opacity: 1,
           y: 0,
