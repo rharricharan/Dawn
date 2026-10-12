@@ -14,6 +14,7 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [email, setEmail] = useState("")
+  const [emailError, setEmailError] = useState<string | null>(null)
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
@@ -34,15 +35,17 @@ export default function LoginPage() {
   }
 
   const handleEmailContinue = () => {
+    setEmailError(null)
+
     if (!email) {
-      setError("Please enter your email address")
+      setEmailError("Email is required.")
       return
     }
 
     // Basic email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(email)) {
-      setError("Please enter a valid email address")
+      setEmailError("Please enter a valid email address.")
       return
     }
 
@@ -127,18 +130,30 @@ export default function LoginPage() {
           </div>
 
           {/* Email Input */}
-          <Input
-            type="email"
-            placeholder="Enter email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                handleEmailContinue()
-              }
-            }}
-            className="h-12 text-base px-6 bg-[#151515]/5 border-transparent rounded-lg placeholder:text-[#151515]/60 placeholder:font-medium hover:border-[#151515] hover:border-2 focus:border-[#151515] focus:border-2 focus-visible:ring-0 focus-visible:ring-offset-0 transition-all"
-          />
+          <div className="space-y-3">
+            <Input
+              type="email"
+              placeholder="Enter email address"
+              value={email}
+              onChange={(e) => {
+                setEmail(e.target.value)
+                if (emailError) setEmailError(null)
+              }}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  handleEmailContinue()
+                }
+              }}
+              className={`h-12 text-base px-6 rounded-2xl placeholder:text-[#151515]/60 placeholder:font-medium focus-visible:ring-0 focus-visible:ring-offset-0 transition-all ${
+                emailError
+                  ? "bg-[#DF3E0D]/8 border-[#DF3E0D] border-2 text-[#151515]/60"
+                  : "bg-[#151515]/5 border-transparent hover:border-[#151515] hover:border-2 focus:border-[#151515] focus:border-2"
+              }`}
+            />
+            {emailError && (
+              <p className="text-sm text-[#A23F21]">{emailError}</p>
+            )}
+          </div>
 
           {/* Continue Button */}
           <div className="border-beam rounded-full">
