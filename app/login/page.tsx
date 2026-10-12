@@ -148,15 +148,15 @@ export default function LoginPage() {
               onClick={handleEmailContinue}
               disabled={isLoading}
             >
-            {isLoading ? (
-              <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                Continue...
-              </>
-            ) : (
-              "Continue"
-            )}
-          </Button>
+              {isLoading ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Continue...
+                </>
+              ) : (
+                "Continue"
+              )}
+            </Button>
           </div>
 
           {/* Terms */}
