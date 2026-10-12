@@ -1,165 +1,19 @@
 "use client"
 
-import { useEffect, useRef, useState } from "react"
-import { gsap } from "gsap"
+import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
 import { Alert, AlertDescription } from "@/components/ui/alert"
-import { signIn, signInWithGoogle } from "@/lib/auth/actions"
-import { startAuthentication } from "@simplewebauthn/browser"
-import { Mail, Key, Sparkles, Loader2, AlertCircle } from "lucide-react"
+import { signInWithGoogle } from "@/lib/auth/actions"
+import { Loader2, AlertCircle } from "lucide-react"
 
 export default function LoginPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [showEmailForm, setShowEmailForm] = useState(false)
   const [email, setEmail] = useState("")
-  const [emailStatus, setEmailStatus] = useState<"idle" | "checking" | "exists" | "not-found">("idle")
-  const [isCheckingEmail, setIsCheckingEmail] = useState(false)
-  const containerRef = useRef<HTMLDivElement>(null)
-  const iconRef = useRef<HTMLDivElement>(null)
-  const headingRef = useRef<HTMLHeadingElement>(null)
-  const buttonsRef = useRef<HTMLDivElement>(null)
-  const footerRef = useRef<HTMLDivElement>(null)
-  const emailCheckTimeout = useRef<NodeJS.Timeout | null>(null)
-
-  useEffect(() => {
-    const ctx = gsap.context(() => {
-      const tl = gsap.timeline({
-        defaults: { ease: "power3.out", clearProps: "all" }
-      })
-
-      // Icon entrance
-      if (iconRef.current) {
-        tl.from(iconRef.current, {
-          scale: 0,
-          rotation: -180,
-          opacity: 0,
-          duration: 0.8,
-          ease: "back.out(1.7)",
-          clearProps: "all",
-        })
-      }
-
-      // Heading fade in
-      if (headingRef.current) {
-        tl.from(
-          headingRef.current,
-          {
-            y: 20,
-            opacity: 0,
-            duration: 0.6,
-            clearProps: "all",
-          },
-          "-=0.4"
-        )
-      }
-
-      // Buttons stagger in
-      if (buttonsRef.current) {
-        tl.from(
-          buttonsRef.current.children,
-          {
-            y: 20,
-            opacity: 0,
-            duration: 0.5,
-            stagger: 0.1,
-            clearProps: "all",
-          },
-          "-=0.3"
-        )
-      }
-
-      // Footer fade in
-      if (footerRef.current) {
-        tl.from(
-          footerRef.current,
-          {
-            y: 10,
-            opacity: 0,
-            duration: 0.5,
-            clearProps: "all",
-          },
-          "-=0.2"
-        )
-      }
-    })
-
-    // Don't revert on cleanup - let animations stay
-    return () => {}
-  }, [])
-
-  // Real-time email validation with debouncing
-  useEffect(() => {
-    // Clear previous timeout
-    if (emailCheckTimeout.current) {
-      clearTimeout(emailCheckTimeout.current)
-    }
-
-    // Reset status if email is empty
-    if (!email || !showEmailForm) {
-      setEmailStatus("idle")
-      return
-    }
-
-    // Basic email format validation
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
-    if (!emailRegex.test(email)) {
-      setEmailStatus("idle")
-      return
-    }
-
-    // Set checking status
-    setEmailStatus("checking")
-    setIsCheckingEmail(true)
-
-    // Debounce the API call
-    emailCheckTimeout.current = setTimeout(async () => {
-      try {
-        const response = await fetch("/api/auth/check-email", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
-        })
-
-        const data = await response.json()
-
-        if (response.ok) {
-          setEmailStatus(data.exists ? "exists" : "not-found")
-        } else {
-          setEmailStatus("idle")
-        }
-      } catch (error) {
-        console.error("Email check error:", error)
-        setEmailStatus("idle")
-      } finally {
-        setIsCheckingEmail(false)
-      }
-    }, 800) // 800ms debounce
-
-    return () => {
-      if (emailCheckTimeout.current) {
-        clearTimeout(emailCheckTimeout.current)
-      }
-    }
-  }, [email, showEmailForm])
-
-  const handleEmailSignIn = async (formData: FormData) => {
-    setIsLoading(true)
-    setError(null)
-
-    const result = await signIn(formData)
-
-    if (result?.error) {
-      setError(result.error)
-      setIsLoading(false)
-    }
-  }
 
   const handleGoogleSignIn = async () => {
     setIsLoading(true)
@@ -169,7 +23,6 @@ export default function LoginPage() {
       const result = await signInWithGoogle()
 
       if (result?.error) {
-        // Friendly error message
         setError("We're having trouble connecting to Google. Please try again in a moment.")
         setIsLoading(false)
       }
@@ -180,90 +33,39 @@ export default function LoginPage() {
     }
   }
 
-  const handlePasskeyAuth = async () => {
-    setIsLoading(true)
-    setError(null)
-
-    try {
-      // Get authentication options
-      const optionsRes = await fetch("/api/passkey/auth-options", {
-        method: "POST",
-      })
-
-      if (!optionsRes.ok) {
-        throw new Error("SYSTEM_ERROR")
-      }
-
-      const options = await optionsRes.json()
-
-      // Start WebAuthn authentication
-      const credential = await startAuthentication(options)
-
-      // Verify authentication with server
-      const verifyRes = await fetch("/api/passkey/auth-verify", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ credential }),
-      })
-
-      if (!verifyRes.ok) {
-        const data = await verifyRes.json()
-        if (data.error?.includes("not found")) {
-          throw new Error("NO_PASSKEY")
-        }
-        throw new Error("PASSKEY_FAILED")
-      }
-
-      // Success! Redirect to dashboard
-      router.push("/")
-    } catch (err: any) {
-      console.error("Passkey auth error:", err)
-
-      // User cancelled the passkey prompt
-      if (err.name === "NotAllowedError" || err.message?.includes("cancelled")) {
-        setIsLoading(false)
-        return
-      }
-
-      // Friendly error messages
-      let errorMessage = "We're having trouble signing you in. Please try again or use a different method."
-
-      if (err.message === "NO_PASSKEY") {
-        errorMessage = "We couldn't find a passkey for your account. Try signing in with Gmail or email instead."
-      } else if (err.message === "PASSKEY_FAILED") {
-        errorMessage = "We couldn't verify your passkey. Please try again or use a different sign-in method."
-      } else if (err.message === "SYSTEM_ERROR") {
-        errorMessage = "We're experiencing technical difficulties. Please try again in a moment."
-      }
-
-      setError(errorMessage)
-      setIsLoading(false)
+  const handleEmailContinue = () => {
+    if (!email) {
+      setError("Please enter your email address")
+      return
     }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      setError("Please enter a valid email address")
+      return
+    }
+
+    // Redirect to register with email pre-filled
+    router.push(`/register?email=${encodeURIComponent(email)}`)
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-muted/20 p-4">
-      <div
-        ref={containerRef}
-        className="w-full max-w-md space-y-8"
-      >
-        {/* Logo/Icon */}
-        <div ref={iconRef} className="flex justify-center">
-          <div className="rounded-full bg-primary/10 p-6">
-            <Sparkles className="h-12 w-12 text-primary" />
-          </div>
+    <div className="flex min-h-screen items-center justify-center p-4">
+      <div className="w-full max-w-md space-y-8">
+        {/* Logo */}
+        <div className="flex justify-center">
+          <div className="h-16 w-16 rounded-2xl bg-gradient-to-br from-orange-400 via-pink-400 to-pink-300" />
         </div>
 
         {/* Heading */}
-        <div ref={headingRef} className="text-center space-y-2">
-          <h1 className="text-3xl font-bold">
-            {showEmailForm ? "What's your email address?" : "Welcome to Dawn"}
+        <div className="text-center space-y-2">
+          <h1 className="text-3xl font-semibold tracking-tight">
+            Welcome back
           </h1>
-          {!showEmailForm && (
-            <p className="text-muted-foreground">
-              Sign in to find your next design client
-            </p>
-          )}
+          <p className="text-muted-foreground">
+            Sign in to continue to Dawn.
+          </p>
         </div>
 
         {/* Error Alert */}
@@ -274,167 +76,90 @@ export default function LoginPage() {
           </Alert>
         )}
 
-        {/* Auth Options */}
-        <div ref={buttonsRef} className="space-y-3">
-          {showEmailForm ? (
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Input
-                  id="email"
-                  name="email"
-                  type="email"
-                  placeholder="Enter your email address..."
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  autoComplete="email"
-                  className="h-12 text-base"
-                  autoFocus
+        {/* Auth Form */}
+        <div className="space-y-6">
+          {/* Continue with Gmail */}
+          <Button
+            variant="outline"
+            size="lg"
+            className="w-full h-12 text-base bg-white/50 border-border/50"
+            onClick={handleGoogleSignIn}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+            ) : (
+              <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                 />
+                <path
+                  fill="currentColor"
+                  d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+                />
+                <path
+                  fill="currentColor"
+                  d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
+                />
+                <path
+                  fill="currentColor"
+                  d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
+                />
+              </svg>
+            )}
+            Continue with Gmail
+          </Button>
 
-                {/* Real-time email validation feedback */}
-                {emailStatus === "checking" && (
-                  <p className="text-sm text-muted-foreground flex items-center gap-2">
-                    <Loader2 className="h-3 w-3 animate-spin" />
-                    Checking email...
-                  </p>
-                )}
-
-                {emailStatus === "not-found" && (
-                  <p className="text-sm text-muted-foreground">
-                    Looks like you're new her! We'd love to have you!{" "}
-                    <Link
-                      href={`/register?email=${encodeURIComponent(email)}`}
-                      className="font-semibold underline hover:text-foreground transition-colors"
-                    >
-                      Create account
-                    </Link>
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-3">
-                {emailStatus === "exists" && (
-                  <Button
-                    type="submit"
-                    size="lg"
-                    className="w-full h-12"
-                    disabled={isLoading}
-                    onClick={(e) => {
-                      e.preventDefault()
-                      setError("Please use 'Continue with Gmail' or 'Continue with Passkey' to sign in")
-                    }}
-                  >
-                    {isLoading ? (
-                      <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                        Continue...
-                      </>
-                    ) : (
-                      "Continue with email"
-                    )}
-                  </Button>
-                )}
-
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="w-full h-12"
-                  onClick={() => {
-                    setShowEmailForm(false)
-                    setEmail("")
-                    setEmailStatus("idle")
-                    setError(null)
-                  }}
-                  disabled={isLoading}
-                >
-                  Back to login
-                </Button>
-              </div>
+          {/* Divider */}
+          <div className="relative">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t border-border/50" />
             </div>
-          ) : (
-            <>
-              {/* Continue with Gmail */}
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full h-12 text-base"
-                onClick={handleGoogleSignIn}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader2 className="mr-2 h-5 w-5 animate-spin" />
-                ) : (
-                  <svg className="mr-2 h-5 w-5" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-                    />
-                    <path
-                      fill="currentColor"
-                      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-                    />
-                  </svg>
-                )}
-                Continue with Gmail
-              </Button>
+            <div className="relative flex justify-center text-xs">
+              <span className="bg-background px-2 text-muted-foreground">or</span>
+            </div>
+          </div>
 
-              <Separator className="my-4" />
+          {/* Email Input */}
+          <Input
+            type="email"
+            placeholder="Enter email address"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleEmailContinue()
+              }
+            }}
+            className="h-12 text-base bg-white/50 border-border/50"
+          />
 
-              {/* Continue with Email */}
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full h-12 text-base"
-                onClick={() => setShowEmailForm(true)}
-                disabled={isLoading}
-              >
-                <Mail className="mr-2 h-5 w-5" />
-                Continue with Email
-              </Button>
+          {/* Continue Button */}
+          <Button
+            size="lg"
+            className="w-full h-12 text-base"
+            onClick={handleEmailContinue}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Continue...
+              </>
+            ) : (
+              "Continue"
+            )}
+          </Button>
 
-              {/* Continue with Passkey */}
-              <Button
-                variant="outline"
-                size="lg"
-                className="w-full h-12 text-base"
-                onClick={handlePasskeyAuth}
-                disabled={isLoading}
-              >
-                <Key className="mr-2 h-5 w-5" />
-                Continue with Passkey
-              </Button>
-            </>
-          )}
-        </div>
-
-        {/* Footer */}
-        <div ref={footerRef} className="text-center space-y-4">
-          <p className="text-sm text-muted-foreground">
-            Don&apos;t have an account yet?{" "}
-            <Link
-              href="/register"
-              className="font-semibold underline hover:text-foreground transition-colors"
-            >
-              Register
-            </Link>
-          </p>
-
-          <p className="text-xs text-muted-foreground">
-            By continuing, you agree to our{" "}
+          {/* Terms */}
+          <p className="text-xs text-center text-muted-foreground">
+            By continuing, you agree to Dawn's{" "}
             <Link
               href="/terms"
               className="underline hover:text-foreground transition-colors"
             >
-              Terms of Service
+              Terms of service
             </Link>{" "}
             and{" "}
             <Link
@@ -445,6 +170,17 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
+
+        {/* Footer */}
+        <p className="text-sm text-center text-muted-foreground">
+          Don't have an account yet?{" "}
+          <Link
+            href="/register"
+            className="font-semibold underline hover:text-foreground transition-colors"
+          >
+            Register
+          </Link>
+        </p>
       </div>
     </div>
   )
