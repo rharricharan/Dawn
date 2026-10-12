@@ -132,12 +132,14 @@
   [role="button"],
   [type="button"],
   [type="submit"] {
-    cursor: pointer;
+    cursor: pointer !important;
   }
 
   button:disabled,
-  a:disabled {
-    cursor: not-allowed;
+  a:disabled,
+  button[disabled],
+  a[disabled] {
+    cursor: not-allowed !important;
   }
 }
 
