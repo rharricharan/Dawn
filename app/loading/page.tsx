@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { gsap } from "gsap"
 
-type AnimationType = "breathing" | "spin" | "bounce" | "pulse"
+type AnimationType = "breathing" | "wave" | "elastic" | "orbit"
 
 export default function LoadingPage() {
   const logoRef = useRef<HTMLImageElement>(null)
@@ -46,45 +46,80 @@ export default function LoadingPage() {
         })
         break
 
-      case "spin":
-        // Spinning rotation
+      case "wave":
+        // Wave effect - undulating motion with rotation and scale
         tl.to(logoRef.current, {
-          rotation: 360,
-          duration: 2,
-          ease: "linear",
+          y: -8,
+          rotation: 3,
+          scale: 1.05,
+          opacity: 0.9,
+          duration: 0.8,
+          ease: "sine.inOut",
         })
-        break
-
-      case "bounce":
-        // Bouncing up and down
-        tl.to(logoRef.current, {
-          y: -20,
-          duration: 0.6,
-          ease: "power2.out",
-        })
+          .to(logoRef.current, {
+            y: 8,
+            rotation: -3,
+            scale: 0.98,
+            opacity: 0.75,
+            duration: 1.6,
+            ease: "sine.inOut",
+          })
           .to(logoRef.current, {
             y: 0,
-            duration: 0.6,
-            ease: "bounce.out",
-          })
-          .to({}, { duration: 0.4 }) // Pause between bounces
-        break
-
-      case "pulse":
-        // Quick pulse effect
-        tl.to(logoRef.current, {
-          scale: 1.15,
-          opacity: 1,
-          duration: 0.3,
-          ease: "power2.out",
-        })
-          .to(logoRef.current, {
+            rotation: 0,
             scale: 1,
             opacity: 0.7,
-            duration: 0.3,
-            ease: "power2.in",
+            duration: 0.8,
+            ease: "sine.inOut",
           })
-          .to({}, { duration: 0.6 }) // Pause
+        break
+
+      case "elastic":
+        // Elastic overshoot with 3D perspective
+        tl.to(logoRef.current, {
+          scale: 1.3,
+          rotation: 8,
+          opacity: 1,
+          duration: 0.6,
+          ease: "back.out(2)",
+        })
+          .to(logoRef.current, {
+            scale: 0.95,
+            rotation: -2,
+            opacity: 0.8,
+            duration: 0.5,
+            ease: "elastic.out(1, 0.5)",
+          })
+          .to(logoRef.current, {
+            scale: 1,
+            rotation: 0,
+            opacity: 0.7,
+            duration: 0.4,
+            ease: "power2.inOut",
+          })
+          .to({}, { duration: 0.3 })
+        break
+
+      case "orbit":
+        // Circular orbit path with rotation
+        const radius = 15
+        tl.to(logoRef.current, {
+          motionPath: {
+            path: [
+              { x: 0, y: 0 },
+              { x: radius, y: -radius },
+              { x: radius * 2, y: 0 },
+              { x: radius, y: radius },
+              { x: 0, y: 0 },
+            ],
+            curviness: 1.5,
+          },
+          rotation: 360,
+          scale: 1.08,
+          opacity: 0.95,
+          duration: 3,
+          ease: "power1.inOut",
+        })
         break
     }
 
@@ -112,9 +147,9 @@ export default function LoadingPage() {
 
   const animations: { type: AnimationType; label: string }[] = [
     { type: "breathing", label: "Breathing" },
-    { type: "spin", label: "Spin" },
-    { type: "bounce", label: "Bounce" },
-    { type: "pulse", label: "Pulse" },
+    { type: "wave", label: "Wave" },
+    { type: "elastic", label: "Elastic" },
+    { type: "orbit", label: "Orbit" },
   ]
 
   return (
