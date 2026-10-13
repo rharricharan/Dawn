@@ -63,7 +63,7 @@ export default function LoadingPage() {
           ref={logoRef}
           src="/dawn-logo.svg"
           alt="Dawn"
-          className="h-[40px] w-auto opacity-70"
+          className="h-[56px] w-auto opacity-70"
           style={{ transformOrigin: "center" }}
         />
         <p
