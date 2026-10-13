@@ -41,15 +41,6 @@ export default function LoadingPage() {
       }
     )
 
-    // Animate percentage text
-    gsap.to(percentRef.current, {
-      opacity: 0.6,
-      duration: 0.8,
-      repeat: -1,
-      yoyo: true,
-      ease: "power1.inOut",
-    })
-
     return () => {
       tl.kill()
       percentTl.kill()
@@ -68,7 +59,7 @@ export default function LoadingPage() {
         />
         <p
           ref={percentRef}
-          className="text-[16px] font-semibold text-[#120902] tracking-[-0.02em] mt-[16px]"
+          className="text-[16px] font-semibold text-[#120902]/70 tracking-[-0.02em] mt-[16px]"
         >
           {percentage}%
         </p>
